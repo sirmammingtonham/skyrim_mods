@@ -1,98 +1,87 @@
-﻿#include "PCH.h"
-#include "BirthsignMenu.h"
+﻿#include "BirthsignMenu.h"
+#include "PCH.h"
 
-// namespace
-// {
-// 	void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
-// 	{
-// 		switch (a_msg->type) {
-// 		case SKSE::MessagingInterface::kDataLoaded:
-// 			{
-// 				Scaleform::SpellmakingMenu::Register();
-// 			}
-// 			break;
-// 		}
-// 	}
-// }
+namespace
+{
+	void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
+	{
+		switch (a_msg->type) {
+		case SKSE::MessagingInterface::kDataLoaded:
+			{
+				Scaleform::BirthsignMenu::Register();
+			}
+			break;
+		}
+	}
+}
 
-// extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface* a_skse, SKSE::PluginInfo* a_info)
-// {
-// #ifndef NDEBUG
-// 	auto sink = std::make_shared<spdlog::sinks::msvc_sink_mt>();
-// #else
-// 	auto path = logger::log_directory();
-// 	if (!path) {
-// 		return false;
-// 	}
+extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface* a_skse, SKSE::PluginInfo* a_info)
+{
+#ifndef NDEBUG
+		auto sink = std::make_shared<spdlog::sinks::msvc_sink_mt>();
+#else
+		auto path = logger::log_directory();
+		if (!path) {
+			util::report_and_fail("Failed to find standard logging directory"sv);
+		}
 
-// 	*path /= "SkyblivionSpellcrafting.log"sv;
-// 	auto sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(path->string(), true);
-// #endif
+		*path /= fmt::format("{}.log"sv, Plugin::NAME);
+		auto sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(path->string(), true);
+#endif
 
-// 	auto log = std::make_shared<spdlog::logger>("global log"s, std::move(sink));
+#ifndef NDEBUG
+		const auto level = spdlog::level::trace;
+#else
+		const auto level = spdlog::level::info;
+#endif
 
-// #ifndef NDEBUG
-// 	log->set_level(spdlog::level::trace);
-// #else
-// 	log->set_level(spdlog::level::info);
-// 	log->flush_on(spdlog::level::warn);
-// #endif
+		auto log = std::make_shared<spdlog::logger>("global log"s, std::move(sink));
+		log->set_level(level);
+		log->flush_on(level);
 
-// 	spdlog::set_default_logger(std::move(log));
-// 	spdlog::set_pattern("%g(%#): [%^%l%$] %v"s);
+		spdlog::set_default_logger(std::move(log));
+		spdlog::set_pattern("%g(%#): [%^%l%$] %v"s);
 
-// 	logger::info("Skyblivion Spellcraft v0.1.0");
+	logger::info("Skywind Birthsign v0.1.0");
 
-// 	a_info->infoVersion = SKSE::PluginInfo::kVersion;
-// 	a_info->name = "SkyblivionSpellcraft";
-// 	a_info->version = 1;
+	a_info->infoVersion = SKSE::PluginInfo::kVersion;
+	a_info->name = "SkywindBirthsign";
+	a_info->version = 1;
 
-// 	if (a_skse->IsEditor()) {
-// 		logger::critical("Loaded in editor, marking as incompatible"sv);
-// 		return false;
-// 	}
+	if (a_skse->IsEditor()) {
+		logger::critical("Loaded in editor, marking as incompatible"sv);
+		return false;
+	}
 
-// 	const auto ver = a_skse->RuntimeVersion();
-// 	if (ver < SKSE::RUNTIME_1_5_39) {
-// 		logger::critical("Unsupported runtime version {}", ver.string());
-// 		return false;
-// 	}
+	const auto ver = a_skse->RuntimeVersion();
+	if (ver < SKSE::RUNTIME_1_5_39) {
+		logger::critical("Unsupported runtime version {}", ver.string());
+		return false;
+	}
 
-// 	return true;
-// }
+	return true;
+}
 
+extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_skse)
+{
+	logger::info("Skywind Birthsign loaded");
 
-// extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_skse)
-// {
-// 	logger::info("Skyblivion Spellcrafting loaded");
+	SKSE::Init(a_skse);
 
-// 	SKSE::Init(a_skse);
+	auto messaging = SKSE::GetMessagingInterface();
+	if (!messaging->RegisterListener("SKSE", MessageHandler)) {
+		logger::critical("Could not register MessageHandler");
+		return false;
+	} else {
+		logger::info("registered listener");
+	}
 
-// 	auto messaging = SKSE::GetMessagingInterface();
-// 	if (!messaging->RegisterListener("SKSE", MessageHandler)) {
-// 		logger::critical("Could not register MessageHandler");
-// 		return false;
-// 	} else {
-// 		logger::info("registered listener");
-// 	}
+	auto papyrus = SKSE::GetPapyrusInterface();
+	if (!papyrus->Register(Scaleform::BirthsignMenu::RegisterFuncs)) {
+		return false;
+	} else {
+		logger::info("registered papyrus Birthsign funcs");
+	}
 
-// 	auto papyrus = SKSE::GetPapyrusInterface();
-// 	if (!papyrus->Register(Scaleform::SpellmakingMenu::RegisterFuncs)) {
-// 		return false;
-// 	} else {
-// 		logger::info("registered papyrus SpellcraftMenu funcs");
-// 	}
-
-// 	try {
-// 		auto serialization = SKSE::GetSerializationInterface();
-// 		serialization->SetUniqueID('SKBL');
-// 		serialization->SetSaveCallback(Spellmaking::SaveCallback);
-// 		serialization->SetLoadCallback(Spellmaking::LoadCallback);
-// 		logger::info("registered spellmaking save callback");
-// 	} catch (...) {
-// 		logger::critical("something wrong in serialization callbacks");
-// 		return false;
-// 	}
-
-// 	return true;
-// }
+	return true;
+}

@@ -191,7 +191,7 @@ class BirthsignMenu extends MovieClip {
         // GameDelegate.call("OnBirthsignPress", [11]);
     }
     private function handleProceedPress(a_event:Object):Void {
-        GameDelegate.call("OnProceedPress", []);
+        GameDelegate.call("ConfirmSelection", []);
     }
     
     public function log(a_message:String):Void {
