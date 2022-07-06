@@ -202,49 +202,49 @@ namespace Scaleform
 
 	void BirthsignMenu::UpdateInfo()
 	{
-		switch (_currentSelection) {
-			case kApprentice:
-				_bigImage.GetInstance().GotoAndStop("apprentice");
-				break;
-			case kAtronach:
-				_bigImage.GetInstance().GotoAndStop("atronach");
-				break;
-			case kRitual:
-				_bigImage.GetInstance().GotoAndStop("ritual");
-				break;
-			case kMage:
-				_bigImage.GetInstance().GotoAndStop("mage");
-				break;
-			case kLady:
-				_bigImage.GetInstance().GotoAndStop("lady");
-				break;
-			case kLord:
-				_bigImage.GetInstance().GotoAndStop("lord");
-				break;
-			case kSteed:
-				_bigImage.GetInstance().GotoAndStop("steed");
-				break;
-			case kWarrior:
-				_bigImage.GetInstance().GotoAndStop("warrior");
-				break;
-			case kSerpent:
-				_bigImage.GetInstance().GotoAndStop("serpent");
-				break;
-			case kLover:
-				_bigImage.GetInstance().GotoAndStop("lover");
-				break;
-			case kShadow:
-				_bigImage.GetInstance().GotoAndStop("shadow");
-				break;
-			case kTower:
-				_bigImage.GetInstance().GotoAndStop("tower");
-				break;
-			case kThief:
-				_bigImage.GetInstance().GotoAndStop("thief");
-				break;
-			default:
-				break;
-		}
+		// switch (_currentSelection) {
+		// 	case kApprentice:
+		// 		_bigImage.GetInstance().GotoAndStop("apprentice");
+		// 		break;
+		// 	case kAtronach:
+		// 		_bigImage.GetInstance().GotoAndStop("atronach");
+		// 		break;
+		// 	case kRitual:
+		// 		_bigImage.GetInstance().GotoAndStop("ritual");
+		// 		break;
+		// 	case kMage:
+		// 		_bigImage.GetInstance().GotoAndStop("mage");
+		// 		break;
+		// 	case kLady:
+		// 		_bigImage.GetInstance().GotoAndStop("lady");
+		// 		break;
+		// 	case kLord:
+		// 		_bigImage.GetInstance().GotoAndStop("lord");
+		// 		break;
+		// 	case kSteed:
+		// 		_bigImage.GetInstance().GotoAndStop("steed");
+		// 		break;
+		// 	case kWarrior:
+		// 		_bigImage.GetInstance().GotoAndStop("warrior");
+		// 		break;
+		// 	case kSerpent:
+		// 		_bigImage.GetInstance().GotoAndStop("serpent");
+		// 		break;
+		// 	case kLover:
+		// 		_bigImage.GetInstance().GotoAndStop("lover");
+		// 		break;
+		// 	case kShadow:
+		// 		_bigImage.GetInstance().GotoAndStop("shadow");
+		// 		break;
+		// 	case kTower:
+		// 		_bigImage.GetInstance().GotoAndStop("tower");
+		// 		break;
+		// 	case kThief:
+		// 		_bigImage.GetInstance().GotoAndStop("thief");
+		// 		break;
+		// 	default:
+		// 		break;
+		// }
 	}
 
 	void BirthsignMenu::ConfirmSelection()

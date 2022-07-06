@@ -10,3 +10,6 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 build/
+RECOVER_*.fla
+*.html
+*.swf
