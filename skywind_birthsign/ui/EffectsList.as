@@ -68,7 +68,7 @@ class EffectsList extends Shared.BSScrollingList {
             var type = Translator.translate(aEntryObject["type"]);
             var name = Translator.translate("$" + aEntryObject["sign"] + "_AB" + aEntryObject["idx"] + "_NAME");
             var desc = Translator.translate("$" + aEntryObject["sign"] + "_AB" + aEntryObject["idx"] + "_DESC");
-            aEntryClip.textField.text = type + ": " + name + " - " + desc;
+            aEntryClip.textField.text = type + ": " + name + " — " + desc;
         }
     }
 
