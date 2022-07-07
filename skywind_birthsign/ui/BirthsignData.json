@@ -11,7 +11,7 @@
       },
       {
         "type": "$ABILITY",
-        "icon": "dest_elemental_weakness",
+        "icon": "default_effect",
         "name": "Elfborn",
         "description": "Weakness to Magicka 50% on Self"
       }
@@ -35,7 +35,7 @@
       },
       {
         "type": "$ABILITY",
-        "icon": "dest_elemental_weakness",
+        "icon": "default_effect",
         "name": "Wombburn (change icon)",
         "description": "No Magicka Regen"
       }
@@ -47,7 +47,7 @@
     "abilities": [
       {
         "type": "$ABILITY",
-        "icon": "default_conjuration",
+        "icon": "default_power",
         "name": "Arkay's Grace",
         "description": "All spells are 25% more powerful vs. undead"
       },
@@ -77,7 +77,7 @@
       },
       {
         "type": "$LESSER_POWER",
-        "icon": "default_mysticism",
+        "icon": "default_power",
         "name": "Fay",
         "description": "Spells are 25% more powerful for 30 seconds but cost 10% more magicka"
       }
@@ -119,7 +119,7 @@
       },
       {
         "type": "$ABILITY",
-        "icon": "dest_elemental_weakness",
+        "icon": "default_effect",
         "name": "Trollkin",
         "description": "Weakness to Fire 100%"
       }
@@ -137,7 +137,7 @@
       },
       {
         "type": "$LESSER_POWER",
-        "icon": "default_alteration",
+        "icon": "default_power",
         "name": "",
         "description": "Weapon speed increased 20%, but lose 2 stamina/sec for 30 seconds"
       }
@@ -149,7 +149,7 @@
     "abilities": [
       {
         "type": "$ABILITY",
-        "icon": "default_destruction",
+        "icon": "default_power",
         "name": "",
         "description": "All physical attacks have a 10% chance of doing double damage"
       }
@@ -167,7 +167,7 @@
       },
       {
         "type": "$ABILITY",
-        "icon": "dest_elemental_weakness",
+        "icon": "default_effect",
         "name": "Star-Curse",
         "description": "Weakness to Poison 100% on self"
       },
@@ -209,7 +209,7 @@
     "abilities": [
       {
         "type": "$LESSER_POWER",
-        "icon": "default_illusion",
+        "icon": "default_power",
         "name": "Fingernail Moon",
         "description": "20% harder to detect & drains 2 stamina/sec for the next 30 seconds"
       },
@@ -227,7 +227,7 @@
     "abilities": [
       {
         "type": "$LESSER_POWER",
-        "icon": "default_alteration",
+        "icon": "default_power",
         "name": "The Master's Hands",
         "description": "For 15 seconds, detect life 200ft & locks are 20% easier to pick"
       },
