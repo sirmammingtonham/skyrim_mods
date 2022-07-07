@@ -4,13 +4,13 @@
     "class": "mage",
     "abilities": [
       {
-        "type": "ABILITY",
+        "type": "$ABILITY",
         "icon": "rest_fortify",
         "name": "Elfborn",
         "description": "Fortify Magicka 1.5x"
       },
       {
-        "type": "ABILITY",
+        "type": "$ABILITY",
         "icon": "dest_elemental_weakness",
         "name": "Elfborn",
         "description": "Weakness to Magicka 50% on Self"
@@ -22,43 +22,43 @@
     "class": "mage",
     "abilities": [
       {
-        "type": "ABILITY",
+        "type": "$ABILITY",
         "icon": "rest_fortify",
         "name": "Wombburn",
         "description": "Fortify Magicka 2.0x"
       },
       {
-        "type": "ABILITY",
+        "type": "$ABILITY",
         "icon": "myst_absorb",
         "name": "Wombburn",
         "description": "Spell Absorption 50% on Self"
       },
       {
-        "type": "ABILITY",
+        "type": "$ABILITY",
         "icon": "dest_elemental_weakness",
         "name": "Wombburn (change icon)",
-        "description": "-100% Magicka regen"
+        "description": "No Magicka Regen"
       }
     ]
   },
   "ritual": {
-    "description": "The Ritual is one of the Mage's charges and its season is Morning Star. Those born under this sign carry the Divine's blessing. They can turn the undead, their spells are more powerful against them, and they have the ability to greatly restore their health and magicka once each day.",
+    "description": "The Ritual is one of the Mage's charges and its season is Morning Star. Those born under this sign carry the Divine's blessing. They can turn the undead, their spells are more powerful against them, and they have the $ability to greatly restore their health and magicka once each day.",
     "class": "mage",
     "abilities": [
       {
-        "type": "ABILITY",
+        "type": "$ABILITY",
         "icon": "default_conjuration",
         "name": "Arkay's Grace",
         "description": "All spells are 25% more powerful vs. undead"
       },
       {
-        "type": "LESSER POWER",
+        "type": "$LESSER_POWER",
         "icon": "conj_turn",
         "name": "Blessed Ward",
         "description": "Turn Undead 100 points (level 30?) for 30 seconds."
       },
       {
-        "type": "GREATER POWER",
+        "type": "$GREATER_POWER",
         "icon": "rest_restore",
         "name": "Mara's Grace",
         "description": "Restore Health and Magicka 100pts"
@@ -70,13 +70,13 @@
     "class": "mage",
     "abilities": [
       {
-        "type": "ABILITY",
+        "type": "$ABILITY",
         "icon": "rest_fortify",
         "name": "Fay",
         "description": "Fortify Magicka 0.5x"
       },
       {
-        "type": "LESSER POWER",
+        "type": "$LESSER_POWER",
         "icon": "default_mysticism",
         "name": "Fay",
         "description": "Spells are 25% more powerful for 30 seconds but cost 10% more magicka"
@@ -88,13 +88,13 @@
     "class": "warrior",
     "abilities": [
       {
-        "type": "ABILITY",
+        "type": "$ABILITY",
         "icon": "rest_fortify",
         "name": "Lady's Favor",
         "description": "Fortify Personality 25 Points"
       },
       {
-        "type": "ABILITY",
+        "type": "$ABILITY",
         "icon": "rest_fortify",
         "name": "Lady's Grace",
         "description": "Fortify Endurance 25 Points"
@@ -106,19 +106,19 @@
     "class": "warrior",
     "abilities": [
       {
-        "type": "ABILITY",
+        "type": "$ABILITY",
         "icon": "rest_fortify",
         "name": "Blood of the North",
         "description": "Fortify Strength 25 Points"
       },
       {
-        "type": "ABILITY",
+        "type": "$ABILITY",
         "icon": "rest_fortify",
         "name": "Blood of the North",
         "description": "Fortify Endurance 25 Points"
       },
       {
-        "type": "ABILITY",
+        "type": "$ABILITY",
         "icon": "dest_elemental_weakness",
         "name": "Trollkin",
         "description": "Weakness to Fire 100%"
@@ -130,13 +130,13 @@
     "class": "warrior",
     "abilities": [
       {
-        "type": "ABILITY",
+        "type": "$ABILITY",
         "icon": "rest_fortify",
         "name": "",
         "description": "Fortify Speed 25 Points on Self"
       },
       {
-        "type": "LESSER POWER",
+        "type": "$LESSER_POWER",
         "icon": "default_alteration",
         "name": "",
         "description": "Weapon speed increased 20%, but lose 2 stamina/sec for 30 seconds"
@@ -148,7 +148,7 @@
     "class": "warrior",
     "abilities": [
       {
-        "type": "ABILITY",
+        "type": "$ABILITY",
         "icon": "default_destruction",
         "name": "",
         "description": "All physical attacks have a 10% chance of doing double damage"
@@ -160,25 +160,25 @@
     "class": "serpent",
     "abilities": [
       {
-        "type": "ABILITY",
+        "type": "$ABILITY",
         "icon": "rest_fortify",
         "name": "Star-Curse",
         "description": "Fortify Luck 25 points"
       },
       {
-        "type": "ABILITY",
+        "type": "$ABILITY",
         "icon": "dest_elemental_weakness",
         "name": "Star-Curse",
         "description": "Weakness to Poison 100% on self"
       },
       {
-        "type": "LESSER POWER",
+        "type": "$LESSER_POWER",
         "icon": "dest_poison",
         "name": "Snake's Bite",
         "description": "Poison on touch 3 points & self 1 points for 30 seconds"
       },
       {
-        "type": "GREATER POWER",
+        "type": "$GREATER_POWER",
         "icon": "rest_cure",
         "name": "Snake Spell",
         "description": "Cure posion"
@@ -190,13 +190,13 @@
     "class": "thief",
     "abilities": [
       {
-        "type": "ABILITY",
+        "type": "$ABILITY",
         "icon": "rest_fortify",
         "name": "Mooncalf",
         "description": "Fortify Agility 25 points on self"
       },
       {
-        "type": "ABILITY",
+        "type": "$ABILITY",
         "icon": "illu_paralysis",
         "name": "Lover's Kiss",
         "description": "Paralyze 60 Seconds on Touch, Damage Fatigue 200 Points on Self"
@@ -204,17 +204,17 @@
     ]
   },
   "shadow": {
-    "description": "The Shadow is a charge of the Thief, and his season is Second Seed. The Shadow grants those born under the sign the ability to better hide in shadows, though the effort is tiring, and once each day they may render themselves invisible for a time.",
+    "description": "The Shadow is a charge of the Thief, and his season is Second Seed. The Shadow grants those born under the sign the $ability to better hide in shadows, though the effort is tiring, and once each day they may render themselves invisible for a time.",
     "class": "thief",
     "abilities": [
       {
-        "type": "LESSER POWER",
+        "type": "$LESSER_POWER",
         "icon": "default_illusion",
         "name": "Fingernail Moon",
         "description": "20% harder to detect & drains 2 stamina/sec for the next 30 seconds"
       },
       {
-        "type": "GREATER POWER",
+        "type": "$GREATER_POWER",
         "icon": "illu_invis",
         "name": "Moonshadow",
         "description": "Invisibility for 60 Seconds on Self"
@@ -226,19 +226,19 @@
     "class": "thief",
     "abilities": [
       {
-        "type": "LESSER POWER",
+        "type": "$LESSER_POWER",
         "icon": "default_alteration",
         "name": "The Master's Hands",
         "description": "For 15 seconds, detect life 200ft & locks are 20% easier to pick"
       },
       {
-        "type": "GREATER POWER",
+        "type": "$GREATER_POWER",
         "icon": "alte_open",
         "name": "Tower Key",
         "description": "Open Adept Lock [50 Points] on Target"
       },
       {
-        "type": "GREATER POWER",
+        "type": "$GREATER_POWER",
         "icon": "myst_reflect",
         "name": "Tower Warden",
         "description": "Reflect Damage 5% for 120 Seconds on Self"
@@ -250,7 +250,7 @@
     "class": "thief",
     "abilities": [
       {
-        "type": "ABILITY",
+        "type": "$ABILITY",
         "icon": "illu_sanctuary",
         "name": "Akiviri Danger-Sense",
         "description": "Sanctuary 10 points"

@@ -10,6 +10,8 @@ class BirthsignButton extends gfx.controls.Button {
     /**
      * The constructor is called when a Button or a sub-class of Button is instantiated on stage or by using {@code attachMovie()} in ActionScript. This component can <b>not</b> be instantiated using {@code new} syntax. When creating new components that extend Button, ensure that a {@code super()} call is made first in the constructor.
      */
+    public var theField;
+    
     public function Button() {
         super();
     }

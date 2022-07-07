@@ -31,5 +31,5 @@ option(COPY_OUTPUT "copy the output of build operations to the game directory" O
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
 add_subdirectory(skyblivion_spellcrafting)
-add_subdirectory(skywind_birthsign)
+# add_subdirectory(skywind_birthsign)
 include(cmake/packaging.cmake)
