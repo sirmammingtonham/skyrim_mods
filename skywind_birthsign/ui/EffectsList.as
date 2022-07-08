@@ -38,7 +38,7 @@ class EffectsList extends Shared.BSScrollingList {
             item._visible = true;
 
             iItemHeightSum += item._height;
-            iOffset += item._height + 10; // bruteforced this value... it just works
+            iOffset += item._height + 5; // bruteforced this value... it just works
 
             if (iItemHeightSum <= fListHeight && iListItemsShown < iMaxItemsShown)
                 ++iListItemsShown;
