@@ -4,3 +4,6 @@
 [submodule "external/skyui"]
 	path = external/skyui
 	url = https://github.com/schlangster/skyui.git
+[submodule "external/skyrimui"]
+	path = external/skyrimui
+	url = https://github.com/Mardoxx/skyrimui.git
