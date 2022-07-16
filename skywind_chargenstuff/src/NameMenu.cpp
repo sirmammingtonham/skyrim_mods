@@ -51,10 +51,10 @@ namespace Scaleform
 	void NameMenu::Accept(RE::FxDelegateHandler::CallbackProcessor* a_processor)
 	{
 		a_processor->Process("Log", Log);
-		a_processor->Process("OnTextFocus", OnTextFocus);
+		// a_processor->Process("OnTextFocus", OnTextFocus);
 		// a_processor->Process("OnTextUnfocus", OnTextUnfocus);
 		a_processor->Process("OnAccept", OnAccept);
-		a_processor->Process("OnCancel", OnCancel);
+		// a_processor->Process("OnCancel", OnCancel);
 		// a_processor->Process("CloseMenu", CloseMenu);
 	}
 
@@ -99,6 +99,9 @@ namespace Scaleform
 			*elem.first = var;
 		}
 
+		RE::ControlMap* map = RE::ControlMap::GetSingleton();
+		map->AllowTextInput(true);
+
 		RefreshPlatform();
 	}
 
@@ -106,6 +109,9 @@ namespace Scaleform
 	{
 		auto bm = RE::UIBlurManager::GetSingleton();
 		bm->DecrementBlurCount();
+
+		RE::ControlMap* map = RE::ControlMap::GetSingleton();
+		map->AllowTextInput(false);
 	}
 
 	void NameMenu::AdvanceMovie(float a_interval, uint32_t a_currentTime)
@@ -157,20 +163,20 @@ namespace Scaleform
 		menu->OnAccept();
 	}
 
-	void NameMenu::OnCancel([[maybe_unused]] const RE::FxDelegateArgs& a_params)
-	{
-		assert(a_params.GetArgCount() == 0);
+	// void NameMenu::OnCancel([[maybe_unused]] const RE::FxDelegateArgs& a_params)
+	// {
+	// 	assert(a_params.GetArgCount() == 0);
 
-		Close();
-	}
+	// 	Close();
+	// }
 
-	void NameMenu::OnTextFocus([[maybe_unused]] const RE::FxDelegateArgs& a_params)
-	{
-		assert(a_params.GetArgCount() == 0);
+	// void NameMenu::OnTextFocus([[maybe_unused]] const RE::FxDelegateArgs& a_params)
+	// {
+	// 	assert(a_params.GetArgCount() == 0);
 
-		RE::ControlMap* map = RE::ControlMap::GetSingleton();
-		map->AllowTextInput(true);
-	}
+	// 	RE::ControlMap* map = RE::ControlMap::GetSingleton();
+	// 	map->AllowTextInput(true);
+	// }
 
 	// void NameMenu::OnTextUnfocus([[maybe_unused]] const RE::FxDelegateArgs& a_params)
 	// {
@@ -204,11 +210,9 @@ namespace Scaleform
 
 	void NameMenu::OnAccept()
 	{
-		logger::info("yeeee {}", _nameField.Text());
-		if (_nameField.Text().length() > 0) {
-			auto player = RE::PlayerCharacter::GetSingleton();
-			player->SetDisplayName(RE::BSFixedString(_nameField.Text()), true);
-		}
+		auto player = RE::PlayerCharacter::GetSingleton();
+		player->GetObjectReference()->As<RE::TESFullName>()->fullName = RE::BSFixedString(_nameField.Text());
+		// player->AddChange(static_cast<uint32_t>(1<<6)); // found this in race menu function, doesnt seem to be needed
 		Close();
 	}
 

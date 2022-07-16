@@ -59,7 +59,7 @@ class RaceSexPanels extends MovieClip
 		GameDelegate.addCallBack("SetRaceText", this, "SetRaceText");
 		GameDelegate.addCallBack("SetRaceList", this, "SetRaceList");
 		GameDelegate.addCallBack("SetOptionSliders", this, "SetSliders");
-		GameDelegate.addCallBack("ShowTextEntryField", this, "ShowTextEntryField");
+		// GameDelegate.addCallBack("ShowTextEntryField", this, "ShowTextEntryField");
 		GameDelegate.addCallBack("moveCategoriesUp", this, "moveCategoriesUp");
 		GameDelegate.addCallBack("HideLoadingIcon", this, "HideLoadingIcon");
 		GameDelegate.addCallBack("FadeOut", this, "FadeOut");
@@ -153,7 +153,12 @@ class RaceSexPanels extends MovieClip
 
 	function onDoneClicked(): Void
 	{
-		GameDelegate.call("ConfirmDone", []);
+		// GameDelegate.call("ConfirmDone", []);
+		if (_playerName) {
+			GameDelegate.call("ChangeName", [_playerName]);
+		} else {
+			GameDelegate.call("ChangeName", ["kid named finger"]);
+		}
 	}
 
 	function SetCategoriesList(): Void
@@ -306,23 +311,18 @@ class RaceSexPanels extends MovieClip
 		ShowItemsList();
 	}
 
-	function ShowTextEntryField(): Void
-	{
-		if (_playerName) {
-			GameDelegate.call("ChangeName", [_playerName]);
-		} else {
-			GameDelegate.call("ChangeName", ["kid named finger"]);
-		}
-		// onNameChange({type: "nameChange", nameChanged: true});
-		// if (bShowTextEntry) {
-		// 	_TextEntryField.TextInputInstance.text = "";
-		// 	_TextEntryField.TextInputInstance.focused = true;
-		// 	FadeTextEntry(true);
-		// 	GameDelegate.call("SetAllowTextInput", []);
-		// 	return;
-		// }
-		// GameDelegate.call("ShowVirtualKeyboard", []);
-	}
+	// function ShowTextEntryField(): Void
+	// {
+	// 	onNameChange({type: "nameChange", nameChanged: true});
+	// 	if (bShowTextEntry) {
+	// 		_TextEntryField.TextInputInstance.text = "";
+	// 		_TextEntryField.TextInputInstance.focused = true;
+	// 		FadeTextEntry(true);
+	// 		GameDelegate.call("SetAllowTextInput", []);
+	// 		return;
+	// 	}
+	// 	GameDelegate.call("ShowVirtualKeyboard", []);
+	// }
 
 	function onItemSelect(event: Object): Void
 	{
