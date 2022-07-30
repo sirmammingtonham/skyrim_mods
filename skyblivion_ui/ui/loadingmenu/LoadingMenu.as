@@ -21,9 +21,9 @@ class LoadingMenu extends MovieClip
 	{
 		GlobalFunc.SetLockFunction();
 		LevelMeterRect.Lock("TR");
-		LoadingTextFader.Lock("BR");
+		// LoadingTextFader.Lock("BR");
 		LoadingText.textAutoSize = "shrink";
-		LoadingText.verticalAlign = "bottom";
+		LoadingText.verticalAlign = "center";
 		LoadingText.SetText(" ");
 		LevelMeter_mc = new Meter(LevelMeterRect.LevelProgressBar);
 	}

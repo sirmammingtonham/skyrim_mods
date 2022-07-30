@@ -1,14 +1,14 @@
 import gfx.controls.TextInput;
+import gfx.controls.Button;
 import gfx.io.GameDelegate;
 import gfx.ui.InputDetails;
 import gfx.ui.NavigationCode;
 import Shared.GlobalFunc;
 import skyui.defines.Input;
 import skyui.util.Translator;
-import skyui.components.MappedButton;
 
 class NameMenu extends MovieClip {
-    private var AcceptButton:MappedButton;
+    private var ProceedButton:Button;
     private var TextInputInstance:TextInput;
     private var _isTyping:Boolean;
 
@@ -24,17 +24,17 @@ class NameMenu extends MovieClip {
     public function InitExtensions():Void {
         super.InitExtensions();
 
-        AcceptButton.disabled = false;
-        AcceptButton.visible = true;
-        AcceptButton.textField.text = Translator.translate("$Accept");
-        AcceptButton.addEventListener("click", this, "onAccept");
+        ProceedButton.disabled = false;
+        ProceedButton.visible = true;
+        ProceedButton.textField.text = Translator.translate("$Accept");
+        ProceedButton.addEventListener("click", this, "onAccept");
         TextInputInstance.maxChars = 26;
     }
 
-    public function SetPlatform(aiPlatform:Number, abPS3Switch:Boolean):Void {
-        AcceptButton.setPlatform(aiPlatform);
-        AcceptButton.setButtonData({text: "$Accept", controls: aiPlatform == 0 ? Input.Enter : {keyCode: 276}});
-    }
+    // public function SetPlatform(aiPlatform:Number, abPS3Switch:Boolean):Void {
+    //     ProceedButton.setPlatform(aiPlatform);
+    //     ProceedButton.setButtonData({text: "$Accept", controls: aiPlatform == 0 ? Input.Enter : {keyCode: 276}});
+    // }
 
     public function handleInput(details:InputDetails, pathToFocus:Array):Boolean {
         if (GlobalFunc.IsKeyPressed(details) && details.navEquivalent == NavigationCode.ENTER) {
