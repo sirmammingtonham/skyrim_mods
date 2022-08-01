@@ -9,4 +9,9 @@ class ClassCreationButton extends Button {
         super();
 		bg.gotoAndStop(bgType);
     }
+
+	public function simulateClick() {
+        handleMousePress();
+        handleMouseRelease();
+    }
 }

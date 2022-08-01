@@ -85,6 +85,15 @@ class ClassCreationMenu extends MovieClip {
     private var attributes_si:MovieClip;
     private var skills_si:MovieClip;
 
+    private var proceed:Button;
+    private var back:Button;
+
+    private var class_art:MovieClip;
+    private var class_description:TextField;
+
+    private var skill_art:MovieClip;
+    private var skill_description:TextField;
+
     /////
     private var _numAttributes:Number = 0;
     private var _numSkills:Number = 0;
@@ -185,6 +194,9 @@ class ClassCreationMenu extends MovieClip {
         specWarrior.addEventListener(EventTypes.CLICK, this, "handleSpecializationPress");
         specMage.addEventListener(EventTypes.CLICK, this, "handleSpecializationPress");
         specThief.addEventListener(EventTypes.CLICK, this, "handleSpecializationPress");
+        specWarrior.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
+        specMage.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
+        specThief.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
 
         agility.addEventListener(EventTypes.CLICK, this, "handleAttributePress")
         endurance.addEventListener(EventTypes.CLICK, this, "handleAttributePress")
@@ -194,6 +206,15 @@ class ClassCreationMenu extends MovieClip {
         speed.addEventListener(EventTypes.CLICK, this, "handleAttributePress")
         strength.addEventListener(EventTypes.CLICK, this, "handleAttributePress")
         willpower.addEventListener(EventTypes.CLICK, this, "handleAttributePress")
+        agility.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover")
+        endurance.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover")
+        intelligence.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover")
+        luck.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover")
+        personality.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover")
+        speed.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover")
+        strength.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover")
+        willpower.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover")
+
         // warrior
         armorer.addEventListener(EventTypes.CLICK, this, "handleSkillPress");
         athletics.addEventListener(EventTypes.CLICK, this, "handleSkillPress");
@@ -204,6 +225,15 @@ class ClassCreationMenu extends MovieClip {
         long_blade.addEventListener(EventTypes.CLICK, this, "handleSkillPress");
         medium_armor.addEventListener(EventTypes.CLICK, this, "handleSkillPress");
         polearm.addEventListener(EventTypes.CLICK, this, "handleSkillPress");
+        armorer.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
+        athletics.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
+        axe.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
+        block.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
+        blunt_weapon.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
+        heavy_armor.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
+        long_blade.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
+        medium_armor.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
+        polearm.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
         // mage
         alchemy.addEventListener(EventTypes.CLICK, this, "handleSkillPress");
         alteration.addEventListener(EventTypes.CLICK, this, "handleSkillPress");
@@ -214,6 +244,15 @@ class ClassCreationMenu extends MovieClip {
         mysticism.addEventListener(EventTypes.CLICK, this, "handleSkillPress");
         restoration.addEventListener(EventTypes.CLICK, this, "handleSkillPress");
         unarmored.addEventListener(EventTypes.CLICK, this, "handleSkillPress");
+        alchemy.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
+        alteration.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
+        conjuration.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
+        destruction.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
+        enchant.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
+        illusion.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
+        mysticism.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
+        restoration.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
+        unarmored.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
         // thief
         acrobatics.addEventListener(EventTypes.CLICK, this, "handleSkillPress");
         hand_to_hand.addEventListener(EventTypes.CLICK, this, "handleSkillPress");
@@ -224,6 +263,23 @@ class ClassCreationMenu extends MovieClip {
         short_blade.addEventListener(EventTypes.CLICK, this, "handleSkillPress");
         sneak.addEventListener(EventTypes.CLICK, this, "handleSkillPress");
         speechcraft.addEventListener(EventTypes.CLICK, this, "handleSkillPress");
+        acrobatics.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
+        hand_to_hand.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
+        light_armor.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
+        marksman.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
+        mercantile.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
+        security.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
+        short_blade.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
+        sneak.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
+        speechcraft.addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
+
+        ///
+        proceed.addEventListener(EventTypes.CLICK, this, "handleProceedPress");
+        back.addEventListener(EventTypes.CLICK, this, "handleBackPress");
+
+
+        ////
+        acrobat.simulateClick();
     }
 
     public function InitExtensions():Void {
@@ -234,23 +290,20 @@ class ClassCreationMenu extends MovieClip {
         return true;
     }
 
-    private function handleClassPress(a_event:Object) {
+    private function handleProceedPress(a_event:Object) {
 
     }
 
+    private function handleBackPress(a_event:Object) {
+
+    }
+
+    private function handleClassPress(a_event:Object) {
+        class_art.gotoAndStop(a_event.target._name);
+    }
+
     private function handleSpecializationPress(a_event:Object) {
-        // if (a_event.target.selected) {
-        //     for (var i = 0; i < _specializationButtons.length; i++) {
-        //         var button = _specializationButtons[i];
-        //         if (!button.selected) {
-        //             button.disabled = true;
-        //         }
-        //     }
-        // } else {
-        //     for (var i = 0; i < _specializationButtons.length; i++) {
-        //         _specializationButtons[i].disabled = false;
-        //     }
-        // }
+
     }
 
     private function handleAttributePress(a_event:Object) {
@@ -277,7 +330,6 @@ class ClassCreationMenu extends MovieClip {
         attributes_si.gotoAndStop(_numAttributes + 1);
     }
 
-
     private function handleSkillPress(a_event:Object) {
         if (a_event.target.selected) {
             _numSkills += 1;
@@ -302,7 +354,15 @@ class ClassCreationMenu extends MovieClip {
         skills_si.gotoAndStop(_numSkills + 1);
     }
 
+    private function handleButtonHover(a_event:Object) {
+        skill_art.gotoAndStop(a_event.target._name);
+        skill_description.text = Translator.translate("$"+a_event.target._name.toUpperCase() + "_DESC");
+    }
+
     private function setButtonText() {
+        skill_description.text = "";
+        class_description.text = ""; // todo: change to default
+
         acrobat.texts.textField.text = Translator.translate("$ACROBAT");
         agent.texts.textField.text = Translator.translate("$AGENT");
         archer.texts.textField.text = Translator.translate("$ARCHER");
