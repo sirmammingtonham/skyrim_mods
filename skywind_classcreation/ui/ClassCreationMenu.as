@@ -12,10 +12,34 @@ import gfx.events.EventDispatcher;
 import gfx.events.EventTypes;
 
 class ClassCreationMenu extends MovieClip {
-    // specialization
-    private var warrior:ClassCreationButton;
+    // class
+    private var acrobat:ClassCreationButton;
+    private var agent:ClassCreationButton;
+    private var archer:ClassCreationButton;
+    private var assassin:ClassCreationButton;
+    private var barbarian:ClassCreationButton;
+    private var bard:ClassCreationButton;
+    private var battlemage:ClassCreationButton;
+    private var crusader:ClassCreationButton;
+    private var healer:ClassCreationButton;
+    private var knight:ClassCreationButton;
     private var mage:ClassCreationButton;
+    private var monk:ClassCreationButton;
+    private var nightblade:ClassCreationButton;
+    private var pilgrim:ClassCreationButton;
+    private var rogue:ClassCreationButton;
+    private var scout:ClassCreationButton;
+    private var sorcerer:ClassCreationButton;
+    private var spellsword:ClassCreationButton;
     private var thief:ClassCreationButton;
+    private var warrior:ClassCreationButton;
+    private var witchhunter:ClassCreationButton;
+    private var custom:ClassCreationButton;
+
+    // specialization
+    private var specWarrior:ClassCreationButton;
+    private var specMage:ClassCreationButton;
+    private var specThief:ClassCreationButton;
 
     // attributes
     private var agility:ClassCreationButton;
@@ -64,13 +88,36 @@ class ClassCreationMenu extends MovieClip {
     /////
     private var _numAttributes:Number = 0;
     private var _numSkills:Number = 0;
+    private var _classButtons:Array;
     private var _specializationButtons:Array;
     private var _attributeButtons:Array;
     private var _skillButtons:Array;
 
     public function ClassCreationMenu() {
         super();
-        _specializationButtons = [warrior, mage, thief];
+        _classButtons = [acrobat,
+            agent,
+            archer,
+            assassin,
+            barbarian,
+            bard,
+            battlemage,
+            crusader,
+            healer,
+            knight,
+            mage,
+            monk,
+            nightblade,
+            pilgrim,
+            rogue,
+            scout,
+            sorcerer,
+            spellsword,
+            thief,
+            warrior,
+            witchhunter,
+            custom];
+        _specializationButtons = [specWarrior, specMage, specThief];
         _attributeButtons = [agility,
             endurance,
             intelligence,
@@ -112,9 +159,32 @@ class ClassCreationMenu extends MovieClip {
         super.onLoad();
         this.setButtonText();
 
-        warrior.addEventListener(EventTypes.CLICK, this, "handleSpecializationPress");
-        mage.addEventListener(EventTypes.CLICK, this, "handleSpecializationPress");
-        thief.addEventListener(EventTypes.CLICK, this, "handleSpecializationPress");
+        acrobat.addEventListener(EventTypes.CLICK, this, "handleClassPress");
+        agent.addEventListener(EventTypes.CLICK, this, "handleClassPress");
+        archer.addEventListener(EventTypes.CLICK, this, "handleClassPress");
+        assassin.addEventListener(EventTypes.CLICK, this, "handleClassPress");
+        barbarian.addEventListener(EventTypes.CLICK, this, "handleClassPress");
+        bard.addEventListener(EventTypes.CLICK, this, "handleClassPress");
+        battlemage.addEventListener(EventTypes.CLICK, this, "handleClassPress");
+        crusader.addEventListener(EventTypes.CLICK, this, "handleClassPress");
+        healer.addEventListener(EventTypes.CLICK, this, "handleClassPress");
+        knight.addEventListener(EventTypes.CLICK, this, "handleClassPress");
+        mage.addEventListener(EventTypes.CLICK, this, "handleClassPress");
+        monk.addEventListener(EventTypes.CLICK, this, "handleClassPress");
+        nightblade.addEventListener(EventTypes.CLICK, this, "handleClassPress");
+        pilgrim.addEventListener(EventTypes.CLICK, this, "handleClassPress");
+        rogue.addEventListener(EventTypes.CLICK, this, "handleClassPress");
+        scout.addEventListener(EventTypes.CLICK, this, "handleClassPress");
+        sorcerer.addEventListener(EventTypes.CLICK, this, "handleClassPress");
+        spellsword.addEventListener(EventTypes.CLICK, this, "handleClassPress");
+        thief.addEventListener(EventTypes.CLICK, this, "handleClassPress");
+        warrior.addEventListener(EventTypes.CLICK, this, "handleClassPress");
+        witchhunter.addEventListener(EventTypes.CLICK, this, "handleClassPress");
+        custom.addEventListener(EventTypes.CLICK, this, "handleClassPress");
+
+        specWarrior.addEventListener(EventTypes.CLICK, this, "handleSpecializationPress");
+        specMage.addEventListener(EventTypes.CLICK, this, "handleSpecializationPress");
+        specThief.addEventListener(EventTypes.CLICK, this, "handleSpecializationPress");
 
         agility.addEventListener(EventTypes.CLICK, this, "handleAttributePress")
         endurance.addEventListener(EventTypes.CLICK, this, "handleAttributePress")
@@ -164,19 +234,23 @@ class ClassCreationMenu extends MovieClip {
         return true;
     }
 
+    private function handleClassPress(a_event:Object) {
+
+    }
+
     private function handleSpecializationPress(a_event:Object) {
-        if (a_event.target.selected) {
-            for (var i = 0; i < _specializationButtons.length; i++) {
-                var button = _specializationButtons[i];
-                if (!button.selected) {
-                    button.disabled = true;
-                }
-            }
-        } else {
-            for (var i = 0; i < _specializationButtons.length; i++) {
-                _specializationButtons[i].disabled = false;
-            }
-        }
+        // if (a_event.target.selected) {
+        //     for (var i = 0; i < _specializationButtons.length; i++) {
+        //         var button = _specializationButtons[i];
+        //         if (!button.selected) {
+        //             button.disabled = true;
+        //         }
+        //     }
+        // } else {
+        //     for (var i = 0; i < _specializationButtons.length; i++) {
+        //         _specializationButtons[i].disabled = false;
+        //     }
+        // }
     }
 
     private function handleAttributePress(a_event:Object) {
@@ -229,16 +303,35 @@ class ClassCreationMenu extends MovieClip {
     }
 
     private function setButtonText() {
-        warrior.texts.textField.autoSize = "center";
-        mage.texts.textField.autoSize = "center";
-        thief.texts.textField.autoSize = "center";
-        warrior.texts.textField.text = Translator.translate("$WARRIOR");
+        acrobat.texts.textField.text = Translator.translate("$ACROBAT");
+        agent.texts.textField.text = Translator.translate("$AGENT");
+        archer.texts.textField.text = Translator.translate("$ARCHER");
+        assassin.texts.textField.text = Translator.translate("$ASSASSIN");
+        barbarian.texts.textField.text = Translator.translate("$BARBARIAN");
+        bard.texts.textField.text = Translator.translate("$BARD");
+        battlemage.texts.textField.text = Translator.translate("$BATTLEMAGE");
+        crusader.texts.textField.text = Translator.translate("$CRUSADER");
+        healer.texts.textField.text = Translator.translate("$HEALER");
+        knight.texts.textField.text = Translator.translate("$KNIGHT");
         mage.texts.textField.text = Translator.translate("$MAGE");
+        monk.texts.textField.text = Translator.translate("$MONK");
+        nightblade.texts.textField.text = Translator.translate("$NIGHTBLADE");
+        pilgrim.texts.textField.text = Translator.translate("$PILGRIM");
+        rogue.texts.textField.text = Translator.translate("$ROGUE");
+        scout.texts.textField.text = Translator.translate("$SCOUT");
+        sorcerer.texts.textField.text = Translator.translate("$SORCERER");
+        spellsword.texts.textField.text = Translator.translate("$SPELLSWORD");
         thief.texts.textField.text = Translator.translate("$THIEF");
+        warrior.texts.textField.text = Translator.translate("$WARRIOR");
+        witchhunter.texts.textField.text = Translator.translate("$WITCHHUNTER");
+        custom.texts.textField.text = Translator.translate("$CUSTOM");
 
-        warrior.texts.valueField.text = "";
-        mage.texts.valueField.text = "";
-        thief.texts.valueField.text = "";
+        specWarrior.texts.textField.autoSize = "center";
+        specMage.texts.textField.autoSize = "center";
+        specThief.texts.textField.autoSize = "center";
+        specWarrior.texts.textField.text = Translator.translate("$WARRIOR");
+        specMage.texts.textField.text = Translator.translate("$MAGE");
+        specThief.texts.textField.text = Translator.translate("$THIEF");
 
         // attributes
         agility.texts.textField.text = Translator.translate("$AGILITY");
