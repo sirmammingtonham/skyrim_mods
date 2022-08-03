@@ -12,6 +12,13 @@ import mx.utils.Delegate;
 import gfx.events.EventDispatcher;
 import gfx.events.EventTypes;
 
+// last todo:
+// figure out way to hover button while disabled
+// populate the health/magicka/whatever
+// add remaining art once finished
+// writing for classes and skills
+// back/proceed buttons
+
 class ClassCreationMenu extends MovieClip {
     public static var QUIZ = 0;
     public static var LIST = 1;
@@ -113,7 +120,7 @@ class ClassCreationMenu extends MovieClip {
     private var _data:Object;
 
     /////
-    private var _mode
+    private var _mode:Number = 2;
     private var _numAttributes:Number = 0;
     private var _numSkills:Number = 0;
     private var _classButtons:Array;
@@ -197,7 +204,7 @@ class ClassCreationMenu extends MovieClip {
         GameDelegate.addCallBack("SetRace", this, "SetRace");
         GameDelegate.addCallBack("SetMode", this, "SetMode");
 
-        // SetMode("creation");
+        // SetMode(LIST);
 
         var loader = new LoadVars();
         loader.onData = Delegate.create(this, completeLoad);
@@ -253,7 +260,7 @@ class ClassCreationMenu extends MovieClip {
     public function SetMode(mode:Number) {
         _mode = mode;
         for (var i = 0; i < _classButtons.length; i++) {
-                _classButtons[i].disabled = (_mode == QUIZ);
+            _classButtons[i].disabled = (_mode == QUIZ);
         }
         for (var i = 0; i < _specButtons.length; i++) {
             _specButtons[i].disabled = (_mode != CUSTOM);
@@ -261,9 +268,13 @@ class ClassCreationMenu extends MovieClip {
         for (var i = 0; i < _attributeButtons.length; i++) {
             _attributeButtons[i].disabled = (_mode != CUSTOM);
         }
-
         for (var i = 0; i < _skillButtons.length; i++) {
             _skillButtons[i].disabled = (_mode != CUSTOM);
+        }
+
+        if (_mode == QUIZ || _mode == LIST) {
+            attributes_si._alpha = 70;
+            skills_si._alpha = 70;
         }
     }
 
@@ -290,7 +301,7 @@ class ClassCreationMenu extends MovieClip {
     private function handleAttributePress(a_event:Object) {
         if (a_event.target.selected) {
             _numAttributes += 1;
-            if (_numAttributes == 2) {
+            if (_mode == CUSTOM && _numAttributes == 2) {
                 for (var i = 0; i < _attributeButtons.length; i++) {
                     var button = _attributeButtons[i];
                     if (!button.selected) {
@@ -300,7 +311,7 @@ class ClassCreationMenu extends MovieClip {
             }
         } else {
             _numAttributes -= 1;
-            if (_numAttributes == 1) {
+            if (_mode == CUSTOM && _numAttributes == 1) {
                 for (var i = 0; i < _attributeButtons.length; i++) {
                     _attributeButtons[i].disabled = false;
                 }
@@ -314,7 +325,7 @@ class ClassCreationMenu extends MovieClip {
     private function handleSkillPress(a_event:Object) {
         if (a_event.target.selected) {
             _numSkills += 1;
-            if (_numSkills == 9) {
+            if (_mode == CUSTOM && _numSkills == 9) {
                 for (var i = 0; i < _skillButtons.length; i++) {
                     var button = _skillButtons[i];
                     if (!button.selected) {
@@ -324,7 +335,7 @@ class ClassCreationMenu extends MovieClip {
             }
         } else {
             _numSkills -= 1;
-            if (_numSkills == 8) {
+            if (_mode == CUSTOM && _numSkills == 8) {
                 for (var i = 0; i < _skillButtons.length; i++) {
                     _skillButtons[i].disabled = false;
                 }
