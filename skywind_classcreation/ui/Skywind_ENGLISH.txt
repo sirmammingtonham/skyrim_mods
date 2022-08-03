@@ -19,7 +19,6 @@ $SPELLSWORD	Spellsword
 $THIEF	Thief
 $WARRIOR	Warrior
 $WITCHHUNTER	Witchhunter
-$CUSTOM	Custom
 $ACROBAT_DESC	Acrobat is a polite euphemism for agile burglars and second-story men. These thieves avoid detection by stealth, and rely on mobility and cunning to avoid capture.
 $AGENT_DESC	Agents are operatives skilled in deception and avoidance, but trained in self-defense and the use of deadly force. Self-reliant and independent, agents devote themselves to personal goals, or to various patrons or causes.
 $ARCHER_DESC	Archers are fighters specializing in long-range combat and rapid movement. Opponents are kept at distance by ranged weapons and swift maneuver, and engaged in melee with sword and shield after the enemy is wounded and weary.
@@ -112,3 +111,11 @@ $SECURITY_DESC	The Security skill lets you open locked doors and containers with
 $SHORT_BLADE_DESC	Characters with great Short Blade skill are more effective with short, quick, thrusting weapons like daggers, tantos, short swords, and wakizashis.
 $SNEAK_DESC	The Sneak discipline is the art of moving unseen and unheard. Skilled sneaks are also adept pickpockets. Note that the skill does not improve simply from use and having the "sneak icon" on the screen. Despite the icon display, the skill only improves when within the detection range of a creature where they would notice the player. Sneak is a very useful skill, as it allows for critical hits.
 $SPEECHCRAFT_DESC	Those skilled in the art of Speechcraft influence others by admiring, intimidating, and taunting them. Listeners are more willing to divulge information or to entrust important tasks to the skilled speaker.
+$SPECIALIZATION	SPECIALIZATION
+$MAJOR_SKILLS	MAJOR SKILLS
+$HEALTH_REGEN	Health Regen
+$MAGICKA_REGEN	Magicka Regen
+$STAMINA_REGEN	Stamina Regen
+$CARRY_WEIGHT	Carry Weight
+$BACK	BACK
+$PROCEED	PROCEED

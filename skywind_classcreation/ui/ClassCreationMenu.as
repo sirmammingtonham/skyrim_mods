@@ -7,11 +7,16 @@ import Shared.GlobalFunc;
 import skyui.defines.Input;
 import skyui.util.Translator;
 
+import mx.utils.Delegate;
 
 import gfx.events.EventDispatcher;
 import gfx.events.EventTypes;
 
 class ClassCreationMenu extends MovieClip {
+    public static var QUIZ = 0;
+    public static var LIST = 1;
+    public static var CUSTOM = 2;
+
     // class
     private var acrobat:ClassCreationButton;
     private var agent:ClassCreationButton;
@@ -82,11 +87,21 @@ class ClassCreationMenu extends MovieClip {
     private var sneak:ClassCreationButton;
     private var speechcraft:ClassCreationButton;
 
+    // stats
+    private var health:MovieClip;
+    private var magicka:MovieClip;
+    private var stamina:MovieClip;
+    private var health_regen:MovieClip;
+    private var magicka_regen:MovieClip;
+    private var stamina_regen:MovieClip;
+    private var carry_weight:MovieClip;
+
+    // other stuff
     private var attributes_si:MovieClip;
     private var skills_si:MovieClip;
 
-    private var proceed:Button;
-    private var back:Button;
+    private var proceed:ClassCreationButton;
+    private var back:ClassCreationButton;
 
     private var class_art:MovieClip;
     private var class_description:TextField;
@@ -94,16 +109,22 @@ class ClassCreationMenu extends MovieClip {
     private var skill_art:MovieClip;
     private var skill_description:TextField;
 
+    private var _race:String = "argonian";
+    private var _data:Object;
+
     /////
+    private var _mode
     private var _numAttributes:Number = 0;
     private var _numSkills:Number = 0;
     private var _classButtons:Array;
-    private var _specializationButtons:Array;
+    private var _specButtons:Array;
     private var _attributeButtons:Array;
     private var _skillButtons:Array;
+    private var _stats:Array;
 
     public function ClassCreationMenu() {
         super();
+
         _classButtons = [acrobat,
             agent,
             archer,
@@ -125,7 +146,7 @@ class ClassCreationMenu extends MovieClip {
             thief,
             warrior,
             witchhunter];
-        _specializationButtons = [specWarrior, specMage, specThief];
+        _specButtons = [specWarrior, specMage, specThief];
         _attributeButtons = [agility,
             endurance,
             intelligence,
@@ -161,28 +182,49 @@ class ClassCreationMenu extends MovieClip {
             short_blade,
             sneak,
             speechcraft];
+
+        _stats = [health,
+            magicka,
+            stamina,
+            health_regen,
+            magicka_regen,
+            stamina_regen,
+            carry_weight];
     }
 
     public function onLoad():Void {
         super.onLoad();
+        GameDelegate.addCallBack("SetRace", this, "SetRace");
+        GameDelegate.addCallBack("SetMode", this, "SetMode");
+
+        // SetMode("creation");
+
+        var loader = new LoadVars();
+        loader.onData = Delegate.create(this, completeLoad);
+        loader.load("class_data.json");
+    }
+
+    private function completeLoad(raw:String) {
+        _data = JSON.parse(raw);
+
         this.setButtonText();
 
         for (var i = 0; i < _classButtons.length; i++) {
-            _classButtons[i].addEventListener(EventTypes.CLICK, this, "handleClassPress");
+            _classButtons[i].addEventListener(EventTypes.SELECT, this, "handleClassPress");
         }
 
-        for (var i = 0; i < _specializationButtons.length; i++) {
-            _specializationButtons[i].addEventListener(EventTypes.CLICK, this, "handleSpecializationPress");
-            _specializationButtons[i].addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
+        for (var i = 0; i < _specButtons.length; i++) {
+            _specButtons[i].addEventListener(EventTypes.SELECT, this, "handleSpecializationPress");
+                // _specButtons[i].addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
         }
 
         for (var i = 0; i < _attributeButtons.length; i++) {
-            _attributeButtons[i].addEventListener(EventTypes.CLICK, this, "handleAttributePress");
+            _attributeButtons[i].addEventListener(EventTypes.SELECT, this, "handleAttributePress");
             _attributeButtons[i].addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
         }
 
         for (var i = 0; i < _skillButtons.length; i++) {
-            _skillButtons[i].addEventListener(EventTypes.CLICK, this, "handleSkillPress");
+            _skillButtons[i].addEventListener(EventTypes.SELECT, this, "handleSkillPress");
             _skillButtons[i].addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
         }
 
@@ -190,8 +232,10 @@ class ClassCreationMenu extends MovieClip {
         proceed.addEventListener(EventTypes.CLICK, this, "handleProceedPress");
         back.addEventListener(EventTypes.CLICK, this, "handleBackPress");
 
-        ////
-        acrobat.simulateClick();
+        //// default value
+        if (_mode != QUIZ) {
+            acrobat.selected = true;
+        }
     }
 
     public function InitExtensions():Void {
@@ -200,6 +244,27 @@ class ClassCreationMenu extends MovieClip {
 
     public function handleInput(details:InputDetails, pathToFocus:Array):Boolean {
         return true;
+    }
+
+    public function SetRace(race:String) {
+        _race = race;
+    }
+
+    public function SetMode(mode:Number) {
+        _mode = mode;
+        for (var i = 0; i < _classButtons.length; i++) {
+                _classButtons[i].disabled = (_mode == QUIZ);
+        }
+        for (var i = 0; i < _specButtons.length; i++) {
+            _specButtons[i].disabled = (_mode != CUSTOM);
+        }
+        for (var i = 0; i < _attributeButtons.length; i++) {
+            _attributeButtons[i].disabled = (_mode != CUSTOM);
+        }
+
+        for (var i = 0; i < _skillButtons.length; i++) {
+            _skillButtons[i].disabled = (_mode != CUSTOM);
+        }
     }
 
     private function handleProceedPress(a_event:Object) {
@@ -211,100 +276,15 @@ class ClassCreationMenu extends MovieClip {
     }
 
     private function handleClassPress(a_event:Object) {
-        unclickAll();
-        switch (a_event.target) {
-            case acrobat:  {
-                clickAll([specThief, athletics, polearms, unarmored, acrobatics, hand_to_hand, light_armor, marksman, security, sneak, agility, endurance]);
-                break;
-            }
-            case agent:  {
-                clickAll([specThief, block, illusion, unarmored, acrobatics, light_armor, mercantile, short_blade, sneak, speechcraft, personality, agility]);
-                break;
-            }
-            case archer:  {
-                clickAll([specWarrior, athletics, block, long_blade, medium_armor, polearms, restoration, light_armor, marksman, sneak, agility, strength]);
-                break;
-            }
-            case assassin:  {
-                clickAll([specThief, athletics, block, alchemy, acrobatics, light_armor, marksman, security, short_blade, sneak, speed, intelligence]);
-                break;
-            }
-            case barbarian:  {
-                clickAll([specWarrior, athletics, axe, block, blunt_weapon, medium_armor, smithing, acrobatics, hand_to_hand, light_armor, strength, speed]);
-                break;
-            }
-            case bard:  {
-                clickAll([specThief, block, long_blade, medium_armor, alchemy, illusion, acrobatics, mercantile, security, speechcraft, personality, intelligence]);
-                break;
-            }
-            case battlemage:  {
-                clickAll([specMage, axe, blunt_weapon, heavy_armor, alteration, conjuration, destruction, enchant, mysticism, marksman, intelligence, strength]);
-                break;
-            }
-            case crusader:  {
-                clickAll([specWarrior, block, blunt_weapon, heavy_armor, long_blade, medium_armor, smithing, alchemy, destruction, restoration, agility, strength]);
-                break;
-            }
-            case healer:  {
-                clickAll([specMage, polearms, alchemy, alteration, illusion, mysticism, restoration, unarmored, hand_to_hand, speechcraft, willpower, personality]);
-                break;
-            }
-            case knight:  {
-                clickAll([specWarrior, axe, block, heavy_armor, long_blade, medium_armor, polearms, smithing, enchant, speechcraft, strength, personality]);
-                break;
-            }
-            case mage:  {
-                clickAll([specMage, alchemy, alteration, conjuration, destruction, enchant, illusion, mysticism, restoration, unarmored, intelligence, willpower]);
-                break;
-            }
-            case monk:  {
-                clickAll([specThief, athletics, polearms, restoration, unarmored, acrobatics, hand_to_hand, light_armor, marksman, sneak, agility, willpower]);
-                break;
-            }
-            case nightblade:  {
-                clickAll([specMage, alteration, destruction, illusion, mysticism, unarmored, light_armor, security, short_blade, sneak, willpower, speed]);
-                break;
-            }
-            case pilgrim:  {
-                clickAll([specThief, block, blunt_weapon, medium_armor, alchemy, restoration, marksman, mercantile, short_blade, speechcraft, personality, endurance]);
-                break;
-            }
-            case rogue:  {
-                clickAll([specWarrior, athletics, axe, block, long_blade, hand_to_hand, light_armor, mercantile, short_blade, speechcraft, speed, personality]);
-                break;
-            }
-            case scout:  {
-                clickAll([specWarrior, athletics, block, long_blade, medium_armor, alchemy, alteration, light_armor, marksman, sneak, speed, endurance]);
-                break;
-            }
-            case sorcerer:  {
-                clickAll([specMage, long_blade, medium_armor, alteration, conjuration, destruction, enchant, illusion, mysticism, short_blade, intelligence, endurance]);
-                break;
-            }
-            case spellsword:  {
-                clickAll([specMage, axe, block, long_blade, medium_armor, alchemy, alteration, destruction, enchant, restoration, willpower, endurance]);
-                break;
-            }
-            case thief:  {
-                clickAll([specThief, acrobatics, hand_to_hand, light_armor, marksman, mercantile, security, short_blade, sneak, speechcraft, speed, agility]);
-                break;
-            }
-            case warrior:  {
-                clickAll([specWarrior, athletics, axe, block, blunt_weapon, heavy_armor, long_blade, medium_armor, polearms, smithing, strength, endurance]);
-                break;
-            }
-            case witchhunter:  {
-                clickAll([specMage, blunt_weapon, alchemy, conjuration, enchant, illusion, mysticism, light_armor, marksman, sneak, intelligence, agility]);
-                break;
-            }
-        }
-        // a_event.target.disabled = true;
+        unselectAll();
+        selectAll(_data["class_presets"][a_event.target._name]);
+
         class_art.gotoAndStop(a_event.target._name);
-        class_description.text = Translator.translate("$" + a_event.target._name.toUpperCase() + "_DESC");
+        class_description.text = _translate("$" + a_event.target._name.toUpperCase() + "_DESC");
     }
 
     private function handleSpecializationPress(a_event:Object) {
-
+        calculateBonuses();
     }
 
     private function handleAttributePress(a_event:Object) {
@@ -328,6 +308,7 @@ class ClassCreationMenu extends MovieClip {
         }
 
         attributes_si.gotoAndStop(_numAttributes + 1);
+        calculateBonuses();
     }
 
     private function handleSkillPress(a_event:Object) {
@@ -341,7 +322,6 @@ class ClassCreationMenu extends MovieClip {
                     }
                 }
             }
-
         } else {
             _numSkills -= 1;
             if (_numSkills == 8) {
@@ -352,11 +332,12 @@ class ClassCreationMenu extends MovieClip {
         }
 
         skills_si.gotoAndStop(_numSkills + 1);
+        calculateBonuses();
     }
 
     private function handleButtonHover(a_event:Object) {
         skill_art.gotoAndStop(a_event.target._name);
-        skill_description.text = Translator.translate("$" + a_event.target._name.toUpperCase() + "_DESC");
+        skill_description.text = _translate("$" + a_event.target._name.toUpperCase() + "_DESC");
     }
 
     private function setButtonText() {
@@ -364,47 +345,119 @@ class ClassCreationMenu extends MovieClip {
         class_description.text = ""; // todo: change to default
 
         for (var i = 0; i < _classButtons.length; i++) {
-            _classButtons[i].texts.textField.text = Translator.translate("$" + _classButtons[i]._name.toUpperCase());
+            _classButtons[i].texts.textField.text = _translate("$" + _classButtons[i]._name.toUpperCase());
         }
 
         for (var i = 0; i < _attributeButtons.length; i++) {
-            _attributeButtons[i].texts.textField.text = Translator.translate("$" + _attributeButtons[i]._name.toUpperCase());
+            _attributeButtons[i].texts.textField.text = _translate("$" + _attributeButtons[i]._name.toUpperCase(), true);
         }
 
         for (var i = 0; i < _skillButtons.length; i++) {
-            _skillButtons[i].texts.textField.text = Translator.translate("$" + _skillButtons[i]._name.toUpperCase());
+            _skillButtons[i].texts.textField.text = _translate("$" + _skillButtons[i]._name.toUpperCase());
+        }
+
+        for (var i = 0; i < _stats.length; i++) {
+            _stats[i].textField.text = _translate("$" + _stats[i]._name.toUpperCase(), true);
         }
 
 
         specWarrior.texts.textField.autoSize = "center";
         specMage.texts.textField.autoSize = "center";
         specThief.texts.textField.autoSize = "center";
-        specWarrior.texts.textField.text = Translator.translate("$WARRIOR");
-        specMage.texts.textField.text = Translator.translate("$MAGE");
-        specThief.texts.textField.text = Translator.translate("$THIEF");
+        specWarrior.texts.textField.text = _translate("$WARRIOR");
+        specMage.texts.textField.text = _translate("$MAGE");
+        specThief.texts.textField.text = _translate("$THIEF");
+
+
+        back.texts.textField.text = _translate("$BACK");
+        proceed.texts.textField.text = _translate("$PROCEED");
     }
 
-    private function clickAll(buttons:Array) {
-        for (var i = 0; i < buttons.length; i++) {
-            buttons[i].simulateClick();
+    // calculate values based on race + selected stuff
+    private function calculateBonuses() {
+        var state = _clone(_data["racial_bonuses"][_race]);
+        // add selected buttons
+        for (var i in _attributeButtons) {
+            if (_attributeButtons[i].selected) {
+                state[_attributeButtons[i]._name] += 10;
+            }
+        }
+        for (var i in _skillButtons) {
+            if (_skillButtons[i].selected) {
+                state[_skillButtons[i]._name] += 10;
+            }
+        }
+        // add bonus from specialization
+        if (specWarrior.selected) {
+            for (var i = 0; i < 9; i++) {
+                state[_skillButtons[i]._name] += 5;
+            }
+        } else if (specMage.selected) {
+            for (var i = 9; i < 18; i++) {
+                state[_skillButtons[i]._name] += 5;
+            }
+        } else if (specThief.selected) {
+            for (var i = 18; i < 27; i++) {
+                state[_skillButtons[i]._name] += 5;
+            }
+        }
+        // update values on menu
+        for (var name in state) {
+            this[name].value = state[name];
         }
     }
 
-    private function unclickAll() {
+    private function selectAll(buttons:Array) {
+        for (var i = 0; i < buttons.length; i++) {
+            this[buttons[i]].selected = true;
+        }
+    }
+
+    private function unselectAll() {
         // might be a more efficient way but fuck it :)
         for (var i = 0; i < _attributeButtons.length; i++) {
             if (_attributeButtons[i].selected) {
-                _attributeButtons[i].simulateClick();
+                _attributeButtons[i].selected = false;
             }
         }
         for (var i = 0; i < _skillButtons.length; i++) {
             if (_skillButtons[i].selected) {
-                _skillButtons[i].simulateClick();
+                _skillButtons[i].selected = false;
             }
         }
     }
 
-    private function disableEdits() {
 
+    private function _translate(str:String, titleCase:Boolean):String {
+        str = Translator.translate(str);
+        if (titleCase) {
+            var arr = str.split(" ");
+            for (var i = 0; i < arr.length; i++) {
+                arr[i] = arr[i].substr(0, 1).toUpperCase() + arr[i].substr(1).toLowerCase();
+            }
+            return arr.join(" ");
+        }
+        return str;
+    }
+
+    private function _clone(obj:Object) {
+        if (obj instanceof Array) {
+            var t = [];
+            for (var i = 0; i < obj.length; i++) {
+                t[i] = (typeof(obj[i]) == "object") ? _clone(obj[i]) : obj[i];
+            }
+        } else if (obj instanceof Date) {
+            var t = new Date(obj.getTime());
+        } else if (obj instanceof XML || obj instanceof MovieClip) {
+            // can't clone obj so return null
+            var t = null;
+            trace("Object.clone won't work on MovieClip or XML");
+        } else {
+            var t = {};
+            for (var i in obj) {
+                t[i] = (typeof(obj[i]) == "object") ? _clone(obj[i]) : obj[i];
+            }
+        }
+        return (t);
     }
 }
