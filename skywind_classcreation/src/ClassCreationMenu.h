@@ -11,10 +11,54 @@
 #include "SKSE/Logger.h"
 
 #include "CLIK/Button.h"
+#include "CLIK/TextField.h"
 #include "CLIK/TextInput.h"
 
 namespace Scaleform
 {
+	namespace
+	{
+		using PlayerSkill = RE::PlayerCharacter::PlayerSkills::Data::Skill;
+
+		enum SkywindAVs
+		{
+			kAxe = RE::ActorValue::kEnchanting,
+			kBlock = RE::ActorValue::kBlock,
+			kBlunt = RE::ActorValue::kTwoHanded,
+			kHeavyArmor = RE::ActorValue::kHeavyArmor,
+			kLongBlade = RE::ActorValue::kOneHanded,
+			kMediumArmor = RE::ActorValue::kHeavyArmorModifier,
+			kPolearm = RE::ActorValue::kSmithing,
+			kSmithing = RE::ActorValue::kSmithingModifier,
+			kAthletics = RE::ActorValue::kTwoHandedModifier,
+			kAlchemy = RE::ActorValue::kAlchemyModifier,
+			kAlteration = RE::ActorValue::kAlteration,
+			kConjuration = RE::ActorValue::kConjuration,
+			kDestruction = RE::ActorValue::kDestruction,
+			kEnchanting = RE::ActorValue::kEnchantingModifier,
+			kIllusion = RE::ActorValue::kIllusion,
+			kMysticism = RE::ActorValue::kAlchemy,
+			kRestoration = RE::ActorValue::kRestoration,
+			kUnarmorerd = RE::ActorValue::kSneakingModifier,
+			kHandToHand = RE::ActorValue::kLightArmorModifier,
+			kLightArmor = RE::ActorValue::kLightArmor,
+			KMarksman = RE::ActorValue::kArchery,
+			kSecurity = RE::ActorValue::kLockpicking,
+			kShortBlade = RE::ActorValue::kPickpocket,
+			kSneak = RE::ActorValue::kSneak,
+			kMercantile = RE::ActorValue::kSpeech,
+			kAcrobatics = RE::ActorValue::kOneHandedModifier,
+			kSpeechcraft = RE::ActorValue::kIllusionModifier,
+			kStrength = RE::ActorValue::kFavorActive,
+			kIntelligence = RE::ActorValue::kFavorsPerDayTimer,
+			kWillpower = RE::ActorValue::kLockpickingModifier,
+			kEndurance = RE::ActorValue::kFavorsPerDay,
+			kAgility = RE::ActorValue::kLastBribedIntimidated,
+			kSpeed = RE::ActorValue::kLastFlattered,
+			kPersonality = RE::ActorValue::kFame,
+			kLuck = RE::ActorValue::kInfamy,
+		};
+	}
 
 	template <class T>
 	class Logger :
@@ -41,6 +85,10 @@ namespace Scaleform
 
 	class ClassCreationMenu : public RE::IMenu
 	{
+	private:
+		static constexpr char SWF_NAME[] = "classcreationmenu";
+		// CLIK::TextField _;
+
 	public:
 		using Base = RE::IMenu;
 		using Result = RE::UI_MESSAGE_RESULTS;
@@ -62,6 +110,9 @@ namespace Scaleform
 		static RE::IMenu* Create();
 		static bool RegisterFuncs(RE::BSScript::IVirtualMachine* a_vm);
 
+		static bool Exec(const RE::SCRIPT_PARAMETER* a_paramInfo, RE::SCRIPT_FUNCTION::ScriptData* a_scriptData, RE::TESObjectREFR* a_thisObj, RE::TESObjectREFR* a_containingObj, RE::Script* a_scriptObj, RE::ScriptLocals* a_locals, double& a_result, uint32_t& a_opcodeOffsetPtr);
+		// static void Register();
+
 	private:
 		void OnMenuOpenMessage();
 		void OnMenuCloseMessage();
@@ -75,6 +126,7 @@ namespace Scaleform
 
 		void InitExtensions();
 		void OnAccept();
+		void SetInfo();
 		// void OnCancel();
 		// void OnTextFocus();
 		// void OnTextUnfocus();
@@ -84,10 +136,6 @@ namespace Scaleform
 		// static void CloseMenuPapyrus(RE::StaticFunctionTag*); //cant imaging a situation where you need to close programmatically
 
 		void SanitizeString(std::string& a_str);
-
-		static constexpr char SWF_NAME[] = "classcreationmenu";
-
-		// CLIK::GFx::Controls::TextInput _nameField;
 	};
 
 	constexpr std::string_view ClassCreationMenu::Name()

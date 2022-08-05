@@ -116,7 +116,7 @@ class ClassCreationMenu extends MovieClip {
     private var skill_art:MovieClip;
     private var skill_description:TextField;
 
-    private var _race:String = "argonian";
+    private var _state:Object = new Object();
     private var _data:Object;
 
     /////
@@ -201,7 +201,8 @@ class ClassCreationMenu extends MovieClip {
 
     public function onLoad():Void {
         super.onLoad();
-        GameDelegate.addCallBack("SetRace", this, "SetRace");
+        // GameDelegate.addCallBack("SetRace", this, "SetRace");
+        GameDelegate.addCallBack("SetInfo", this, "SetInfo");
         GameDelegate.addCallBack("SetMode", this, "SetMode");
 
         // SetMode(LIST);
@@ -253,10 +254,6 @@ class ClassCreationMenu extends MovieClip {
         return true;
     }
 
-    public function SetRace(race:String) {
-        _race = race;
-    }
-
     public function SetMode(mode:Number) {
         _mode = mode;
         for (var i = 0; i < _classButtons.length; i++) {
@@ -276,6 +273,21 @@ class ClassCreationMenu extends MovieClip {
             attributes_si._alpha = 70;
             skills_si._alpha = 70;
         }
+    }
+
+    private function SetInfo() {
+        // sets the initial info
+        for (var i = 0; i < _stats.length; i++) {
+            _state[_stats[i]._name] = arguments[0][_stats[i]._name];
+        }
+        for (var i = 0; i < _attributeButtons.length; i++) {
+            _state[_attributeButtons[i]._name] = arguments[1][_attributeButtons[i]._name];
+        }
+        for (var i = 0; i < _skillButtons.length; i++) {
+            _state[_skillButtons[i]._name] = arguments[2][_skillButtons[i]._name];
+        }
+
+        calculateBonuses();
     }
 
     private function handleProceedPress(a_event:Object) {
@@ -384,37 +396,43 @@ class ClassCreationMenu extends MovieClip {
         proceed.texts.textField.text = _translate("$PROCEED");
     }
 
-    // calculate values based on race + selected stuff
     private function calculateBonuses() {
-        var state = _clone(_data["racial_bonuses"][_race]);
+        var state_copy = _clone(_state);
         // add selected buttons
         for (var i in _attributeButtons) {
             if (_attributeButtons[i].selected) {
-                state[_attributeButtons[i]._name] += 10;
+                state_copy[_attributeButtons[i]._name] += 10;
             }
         }
         for (var i in _skillButtons) {
             if (_skillButtons[i].selected) {
-                state[_skillButtons[i]._name] += 10;
+                state_copy[_skillButtons[i]._name] += 10;
             }
         }
+        
+
         // add bonus from specialization
         if (specWarrior.selected) {
             for (var i = 0; i < 9; i++) {
-                state[_skillButtons[i]._name] += 5;
+                state_copy[_skillButtons[i]._name] += 5;
             }
         } else if (specMage.selected) {
             for (var i = 9; i < 18; i++) {
-                state[_skillButtons[i]._name] += 5;
+                state_copy[_skillButtons[i]._name] += 5;
             }
         } else if (specThief.selected) {
             for (var i = 18; i < 27; i++) {
-                state[_skillButtons[i]._name] += 5;
+                state_copy[_skillButtons[i]._name] += 5;
             }
         }
+        
         // update values on menu
-        for (var name in state) {
-            this[name].value = state[name];
+        for (var name in state_copy) {
+            this[name].value = state_copy[name];
+        }
+        for (var i in _stats) {
+            var name = _stats[i]._name;
+            this[name].valueField.text = state_copy[name];
         }
     }
 
