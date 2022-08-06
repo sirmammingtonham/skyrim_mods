@@ -87,6 +87,13 @@ namespace Scaleform
 	{
 	private:
 		static constexpr char SWF_NAME[] = "classcreationmenu";
+		enum MenuMode
+		{
+			kQuiz = 0,
+			kList,
+			kCustom,
+		};
+		static MenuMode _mode;
 		// CLIK::TextField _;
 
 	public:
@@ -120,19 +127,22 @@ namespace Scaleform
 		static void Log(const RE::FxDelegateArgs& a_params);
 		static void OnTextFocus(const RE::FxDelegateArgs& a_params);
 		static void OnTextUnfocus(const RE::FxDelegateArgs& a_params);
-		static void OnAccept(const RE::FxDelegateArgs& a_params);
+		static void OnProceed(const RE::FxDelegateArgs& a_params);
+		static void OnBack(const RE::FxDelegateArgs& a_params);
 		static void OnCancel(const RE::FxDelegateArgs& a_params);
 		static void CloseMenu(const RE::FxDelegateArgs& a_params);
 
 		void InitExtensions();
-		void OnAccept();
+		void OnProceed();
+		void OnBack();
+		void SetMode();
 		void SetInfo();
 		// void OnCancel();
 		// void OnTextFocus();
 		// void OnTextUnfocus();
 
 		// papyrus register helpers
-		static void OpenMenuPapyrus(RE::StaticFunctionTag*);
+		static void OpenMenuPapyrus(RE::StaticFunctionTag*, int32_t type);
 		// static void CloseMenuPapyrus(RE::StaticFunctionTag*); //cant imaging a situation where you need to close programmatically
 
 		void SanitizeString(std::string& a_str);

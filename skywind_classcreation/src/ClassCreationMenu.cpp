@@ -8,6 +8,8 @@
 
 namespace Scaleform
 {
+	ClassCreationMenu::MenuMode ClassCreationMenu::_mode = MenuMode::kCustom;
+
 	ClassCreationMenu::ClassCreationMenu()
 	{
 		using Context = RE::UserEvents::INPUT_CONTEXT_ID;
@@ -22,10 +24,6 @@ namespace Scaleform
 			fxDelegate->RegisterHandler(this);
 			a_def->SetState(StateType::kExternalInterface, fxDelegate.get());
 			fxDelegate->Release();
-
-			//auto logger = new Logger<ClassCreationMenu>();
-			//a_def->SetState(StateType::kLog, logger);
-			//logger->Release();
 
 			a_def->SetState(
 				RE::GFxState::StateType::kLog,
@@ -49,7 +47,8 @@ namespace Scaleform
 	void ClassCreationMenu::Accept(RE::FxDelegateHandler::CallbackProcessor* a_processor)
 	{
 		a_processor->Process("Log", Log);
-		a_processor->Process("OnAccept", OnAccept);
+		a_processor->Process("OnProceed", OnProceed);
+		a_processor->Process("OnBack", OnBack);
 	}
 
 	auto ClassCreationMenu::ProcessMessage(RE::UIMessage& a_message)
@@ -75,35 +74,9 @@ namespace Scaleform
 		auto bm = RE::UIBlurManager::GetSingleton();
 		bm->IncrementBlurCount();
 
-		bool success;
 		uiMovie->SetVisible(true);
-		std::vector<std::pair<CLIK::Object*, std::string>> toGet;
 
-		// toGet.push_back(std::make_pair(&_attributes.agility, "agility.texts.textField"));
-		// toGet.push_back(std::make_pair(&_attributes.endurance, "endurance.texts.textField"));
-		// toGet.push_back(std::make_pair(&_attributes.intelligence, "intelligence.texts.textField"));
-		// toGet.push_back(std::make_pair(&_attributes.luck, "luck.texts.textField"));
-		// toGet.push_back(std::make_pair(&_attributes.personality, "personality.texts.textField"));
-		// toGet.push_back(std::make_pair(&_attributes.speed, "speed.texts.textField"));
-		// toGet.push_back(std::make_pair(&_attributes.strength, "strength.texts.textField"));
-		// toGet.push_back(std::make_pair(&_attributes.willpower, "willpower.texts.textField"));
-
-		RE::GFxValue var;
-		for (auto& elem : toGet) {
-			std::string root("ClassCreationMenu_mc.");
-			auto element = root + elem.second;
-			success = uiMovie->GetVariable(&var, element.c_str());
-			if (!success) {
-				logger::info("couldn't get {}", element);
-				assert(success);
-			}
-			*elem.first = var;
-		}
-
-		// RE::ControlMap* map = RE::ControlMap::GetSingleton();
-		// map->AllowTextInput(true);
-
-		// RefreshPlatform();
+		SetMode();
 		SetInfo();
 	}
 
@@ -112,8 +85,8 @@ namespace Scaleform
 		auto bm = RE::UIBlurManager::GetSingleton();
 		bm->DecrementBlurCount();
 
-		// RE::ControlMap* map = RE::ControlMap::GetSingleton();
-		// map->AllowTextInput(false);
+		RE::ControlMap* map = RE::ControlMap::GetSingleton();
+		map->AllowTextInput(false);
 	}
 
 	void ClassCreationMenu::AdvanceMovie(float a_interval, uint32_t a_currentTime)
@@ -209,11 +182,18 @@ namespace Scaleform
 		logger::info("{} swf: {}", Name().data(), a_params[0].GetString());
 	}
 
-	void ClassCreationMenu::OnAccept([[maybe_unused]] const RE::FxDelegateArgs& a_params)
+	void ClassCreationMenu::OnProceed([[maybe_unused]] const RE::FxDelegateArgs& a_params)
 	{
 		assert(a_params.GetArgCount() == 0);
 		auto menu = static_cast<ClassCreationMenu*>(a_params.GetHandler());
-		menu->OnAccept();
+		menu->OnProceed();
+	}
+
+	void ClassCreationMenu::OnBack([[maybe_unused]] const RE::FxDelegateArgs& a_params)
+	{
+		assert(a_params.GetArgCount() == 0);
+		auto menu = static_cast<ClassCreationMenu*>(a_params.GetHandler());
+		menu->OnBack();
 	}
 
 	// void ClassCreationMenu::OnCancel([[maybe_unused]] const RE::FxDelegateArgs& a_params)
@@ -261,7 +241,7 @@ namespace Scaleform
 		assert(success);
 	}
 
-	void ClassCreationMenu::OnAccept()
+	void ClassCreationMenu::OnProceed()
 	{
 		// auto player = RE::PlayerCharacter::GetSingleton();
 		// player->GetObjectReference()->As<RE::TESFullName>()->fullName = RE::BSFixedString(_nameField.Text());
@@ -271,8 +251,29 @@ namespace Scaleform
 		Close();
 	}
 
-	void ClassCreationMenu::SetInfo() {
-		logger::info("SROEHUOERSUCRCEOUHRSHEUOCROEUSROHEUCH");
+	void ClassCreationMenu::OnBack()
+	{
+		Close();
+	}
+
+	void ClassCreationMenu::SetMode()
+	{
+		if (_mode == MenuMode::kCustom) {
+			RE::ControlMap* map = RE::ControlMap::GetSingleton();
+			map->AllowTextInput(true);
+		}
+		
+		RE::FxResponseArgs<1> response;
+		RE::GFxValue mode;
+		mode.SetNumber(static_cast<double>(_mode));
+		response.Add(mode);
+		RE::FxDelegate::Invoke(uiMovie.get(), "SetMode", response);
+
+		logger::info("opening class menu in mode {}", _mode);
+	}
+
+	void ClassCreationMenu::SetInfo()
+	{
 		auto player = RE::PlayerCharacter::GetSingleton();
 
 		RE::FxResponseArgs<3> response;
@@ -346,20 +347,17 @@ namespace Scaleform
 		}
 	}
 
-	void ClassCreationMenu::OpenMenuPapyrus(RE::StaticFunctionTag*)
+	void ClassCreationMenu::OpenMenuPapyrus(RE::StaticFunctionTag*, int32_t mode)
 	{
+		assert(mode >= 0 && mode <= 2);
+		_mode = static_cast<MenuMode>(mode);
 		auto task = SKSE::GetTaskInterface();
 		task->AddUITask(Open);
 	}
-	// void ClassCreationMenu::CloseMenuPapyrus(RE::StaticFunctionTag*)
-	// {
-	// 	auto task = SKSE::GetTaskInterface();
-	// 	task->AddUITask(Close);
-	// }
 
 	bool ClassCreationMenu::RegisterFuncs(RE::BSScript::IVirtualMachine* a_vm)
 	{
-		a_vm->RegisterFunction("OpenClassMenu", "Skywind", Scaleform::ClassCreationMenu::OpenMenuPapyrus);
+		a_vm->RegisterFunction("OpenClassMenu", "Skywind", OpenMenuPapyrus);
 		return true;
 	}
 }

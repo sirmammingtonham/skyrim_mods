@@ -19,6 +19,7 @@ $SPELLSWORD	Spellsword
 $THIEF	Thief
 $WARRIOR	Warrior
 $WITCHHUNTER	Witchhunter
+$CUSTOM	Adventurer
 $ACROBAT_DESC	Acrobat is a polite euphemism for agile burglars and second-story men. These thieves avoid detection by stealth, and rely on mobility and cunning to avoid capture.
 $AGENT_DESC	Agents are operatives skilled in deception and avoidance, but trained in self-defense and the use of deadly force. Self-reliant and independent, agents devote themselves to personal goals, or to various patrons or causes.
 $ARCHER_DESC	Archers are fighters specializing in long-range combat and rapid movement. Opponents are kept at distance by ranged weapons and swift maneuver, and engaged in melee with sword and shield after the enemy is wounded and weary.
@@ -40,7 +41,8 @@ $SPELLSWORD_DESC	Spellswords are spellcasting specialists trained to support Imp
 $THIEF_DESC	Thieves are pickpockets and pilferers. Unlike robbers, who kill and loot, thieves typically choose stealth and subterfuge over violence, and often entertain romantic notions of their charm and cleverness in their acquisitive activities.
 $WARRIOR_DESC	Warriors are the professional men-at-arms, soldiers, mercenaries, and adventurers of the Empire, trained with various weapons and armor styles, conditioned by long marches, and hardened by ambush, skirmish, and battle.
 $WITCHHUNTER_DESC	Witchhunters are dedicated to rooting out and destroying the perverted practices of dark cults and profane sorcery. They train for martial, magical, and stealthy war against vampires, witches, warlocks, and necromancers.
-$CUSTOM_DESC	Lorem ipsum and all that
+$CUSTOM_CLASSDESC	What the vehk did you just vehking say about me, you little s'wit? I'll have you know I graduated top of my class in the Bouyant Armigers, and I've been involved in numerous secret raids on the Sixth House, and I have over 300 confirmed kills. I am trained in Ashlander warfare and I'm the top Marksman in the entire Tribunal Temple. You are nothing to me but just another scrib. edit me.
+$CUSTOM_DESC	You can edit the class name and description.
 $AGILITY	Agility
 $ENDURANCE	Endurance
 $INTELLIGENCE	Intelligence

@@ -29,6 +29,17 @@ class ClassCreationButton extends Button {
     //     selected = true;
     // }
 
+    // override
+    private function handleMouseRollOver(controllerIdx:Number):Void {
+        if (!_disabled) {
+            if ((!_focused && !_displayFocus) || focusIndicator != null) {
+                setState("over"); // Otherwise it is focused, and has no focusIndicator, so do nothing.
+            }
+        }
+
+        dispatchEventAndSound({type: "rollOver", controllerIdx: controllerIdx});
+    }
+
     private function _update() {
         texts.valueField.text = _value.toString();
     }

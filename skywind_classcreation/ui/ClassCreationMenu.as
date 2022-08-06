@@ -1,5 +1,6 @@
-import gfx.controls.TextInput;
 import gfx.controls.Button;
+import gfx.controls.TextInput;
+import gfx.controls.TextArea;
 import gfx.io.GameDelegate;
 import gfx.ui.InputDetails;
 import gfx.ui.NavigationCode;
@@ -13,11 +14,9 @@ import gfx.events.EventDispatcher;
 import gfx.events.EventTypes;
 
 // last todo:
-// figure out way to hover button while disabled
-// populate the health/magicka/whatever
 // add remaining art once finished
 // writing for classes and skills
-// back/proceed buttons
+// hook up to papyrus
 
 class ClassCreationMenu extends MovieClip {
     public static var QUIZ = 0;
@@ -46,7 +45,6 @@ class ClassCreationMenu extends MovieClip {
     private var thief:ClassCreationButton;
     private var warrior:ClassCreationButton;
     private var witchhunter:ClassCreationButton;
-    // private var custom:ClassCreationButton;
 
     // specialization
     private var specWarrior:ClassCreationButton;
@@ -111,7 +109,8 @@ class ClassCreationMenu extends MovieClip {
     private var back:ClassCreationButton;
 
     private var class_art:MovieClip;
-    private var class_description:TextField;
+    private var class_description:ClassCreationTextInput;
+    private var custom:ClassCreationTextInput;
 
     private var skill_art:MovieClip;
     private var skill_description:TextField;
@@ -206,6 +205,7 @@ class ClassCreationMenu extends MovieClip {
         GameDelegate.addCallBack("SetMode", this, "SetMode");
 
         // SetMode(LIST);
+        SetMode(CUSTOM);
 
         var loader = new LoadVars();
         loader.onData = Delegate.create(this, completeLoad);
@@ -239,11 +239,6 @@ class ClassCreationMenu extends MovieClip {
         ///
         proceed.addEventListener(EventTypes.CLICK, this, "handleProceedPress");
         back.addEventListener(EventTypes.CLICK, this, "handleBackPress");
-
-        //// default value
-        if (_mode != QUIZ) {
-            acrobat.selected = true;
-        }
     }
 
     public function InitExtensions():Void {
@@ -257,7 +252,7 @@ class ClassCreationMenu extends MovieClip {
     public function SetMode(mode:Number) {
         _mode = mode;
         for (var i = 0; i < _classButtons.length; i++) {
-            _classButtons[i].disabled = (_mode == QUIZ);
+            _classButtons[i].disabled = (_mode != LIST);
         }
         for (var i = 0; i < _specButtons.length; i++) {
             _specButtons[i].disabled = (_mode != CUSTOM);
@@ -269,33 +264,48 @@ class ClassCreationMenu extends MovieClip {
             _skillButtons[i].disabled = (_mode != CUSTOM);
         }
 
-        if (_mode == QUIZ || _mode == LIST) {
+        // allow text editing and set class button visibility
+        if (_mode == CUSTOM) {
+            for (var i = 0; i < _classButtons.length; i++) {
+                _classButtons[i]._alpha = 0.0;
+            }
+            class_art.gotoAndStop("custom");
+        } else {
+            class_description.disabled = true;
+            custom.disabled = true;
+            custom._alpha = 0.0;
             attributes_si._alpha = 70;
             skills_si._alpha = 70;
         }
+
+
+        //// default value
+        if (_mode == LIST) {
+            acrobat.selected = true;
+        }
     }
 
-    private function SetInfo() {
+    private function SetInfo(statsArg:Object, attrArg:Object, skillArg:Object) {
         // sets the initial info
         for (var i = 0; i < _stats.length; i++) {
-            _state[_stats[i]._name] = arguments[0][_stats[i]._name];
+            _state[_stats[i]._name] = statsArg[_stats[i]._name];
         }
         for (var i = 0; i < _attributeButtons.length; i++) {
-            _state[_attributeButtons[i]._name] = arguments[1][_attributeButtons[i]._name];
+            _state[_attributeButtons[i]._name] = attrArg[_attributeButtons[i]._name];
         }
         for (var i = 0; i < _skillButtons.length; i++) {
-            _state[_skillButtons[i]._name] = arguments[2][_skillButtons[i]._name];
+            _state[_skillButtons[i]._name] = skillArg[_skillButtons[i]._name];
         }
 
         calculateBonuses();
     }
 
     private function handleProceedPress(a_event:Object) {
-
+        GameDelegate.call("OnProceed", []);
     }
 
     private function handleBackPress(a_event:Object) {
-
+        GameDelegate.call("OnBack", []);
     }
 
     private function handleClassPress(a_event:Object) {
@@ -364,8 +374,7 @@ class ClassCreationMenu extends MovieClip {
     }
 
     private function setButtonText() {
-        skill_description.text = "";
-        class_description.text = ""; // todo: change to default
+        skill_description.text = ""; // todo: change to default
 
         for (var i = 0; i < _classButtons.length; i++) {
             _classButtons[i].texts.textField.text = _translate("$" + _classButtons[i]._name.toUpperCase());
@@ -409,7 +418,7 @@ class ClassCreationMenu extends MovieClip {
                 state_copy[_skillButtons[i]._name] += 10;
             }
         }
-        
+
 
         // add bonus from specialization
         if (specWarrior.selected) {
@@ -425,7 +434,7 @@ class ClassCreationMenu extends MovieClip {
                 state_copy[_skillButtons[i]._name] += 5;
             }
         }
-        
+
         // update values on menu
         for (var name in state_copy) {
             this[name].value = state_copy[name];
