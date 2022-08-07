@@ -16,11 +16,97 @@
 
 namespace Scaleform
 {
-	namespace
+	namespace Skywind
 	{
 		using PlayerSkill = RE::PlayerCharacter::PlayerSkills::Data::Skill;
 
-		enum SkywindAVs
+		enum class Class
+		{
+			kAcrobat = 0,
+			kAgent,
+			kArcher,
+			kAssassin,
+			kBarbarian,
+			kBard,
+			kBattlemage,
+			kCrusader,
+			kHealer,
+			kKnight,
+			kMage,
+			kMonk,
+			kNightblade,
+			kPilgrim,
+			kRogue,
+			kScout,
+			kSorcerer,
+			kSpellsword,
+			kThief,
+			kWarrior,
+			kWitchhunter,
+		};
+
+		enum class Attribute
+		{
+			kAgility = 0,
+			kEndurance,
+			kIntelligence,
+			kLuck,
+			kPersonality,
+			kSpeed,
+			kStrength,
+			kWillpower,
+		};
+
+		enum class Specialization
+		{
+			// combat skills
+			kCombat = 0,
+			kMagic,
+			kStealth
+		};
+
+		enum class Skill
+		{
+			kAthletics = 0,
+			kAxe,
+			kBlock,
+			kBlunt,
+			kHeavyArmor,
+			kLongBlade,
+			kMediumArmor,
+			kPolearm,
+			kSmithing,
+			kAlchemy,
+			kAlteration,
+			kConjuration,
+			kDestruction,
+			kEnchanting,
+			kIllusion,
+			kMysticism,
+			kRestoration,
+			kUnarmorerd,
+			kAcrobatics,
+			kHandToHand,
+			kLightArmor,
+			kMarksman,
+			kMercantile,
+			kSecurity,
+			kShortBlade,
+			kSneak,
+			kSpeechcraft,
+		};
+
+		struct CustomClassData
+		{
+			std::pair<Attribute, Attribute> attributes;
+			Specialization specialization;
+			std::array<Skill, 9> skills;
+
+			std::string name;
+			std::string description;
+		};
+
+		enum ActorValue
 		{
 			kAxe = RE::ActorValue::kEnchanting,
 			kBlock = RE::ActorValue::kBlock,
@@ -42,7 +128,7 @@ namespace Scaleform
 			kUnarmorerd = RE::ActorValue::kSneakingModifier,
 			kHandToHand = RE::ActorValue::kLightArmorModifier,
 			kLightArmor = RE::ActorValue::kLightArmor,
-			KMarksman = RE::ActorValue::kArchery,
+			kMarksman = RE::ActorValue::kArchery,
 			kSecurity = RE::ActorValue::kLockpicking,
 			kShortBlade = RE::ActorValue::kPickpocket,
 			kSneak = RE::ActorValue::kSneak,
@@ -127,22 +213,22 @@ namespace Scaleform
 		static void Log(const RE::FxDelegateArgs& a_params);
 		static void OnTextFocus(const RE::FxDelegateArgs& a_params);
 		static void OnTextUnfocus(const RE::FxDelegateArgs& a_params);
-		static void OnProceed(const RE::FxDelegateArgs& a_params);
+		static void OnProceedQuiz(const RE::FxDelegateArgs& a_params);
+		static void OnProceedList(const RE::FxDelegateArgs& a_params);
+		static void OnProceedCustom(const RE::FxDelegateArgs& a_params);
 		static void OnBack(const RE::FxDelegateArgs& a_params);
-		static void OnCancel(const RE::FxDelegateArgs& a_params);
 		static void CloseMenu(const RE::FxDelegateArgs& a_params);
 
 		void InitExtensions();
-		void OnProceed();
+		void OnProceedQuiz();
+		void OnProceedList(Skywind::Class a_class);
+		void OnProceedCustom(Skywind::CustomClassData a_data);
 		void OnBack();
 		void SetMode();
 		void SetInfo();
-		// void OnCancel();
-		// void OnTextFocus();
-		// void OnTextUnfocus();
 
 		// papyrus register helpers
-		static void OpenMenuPapyrus(RE::StaticFunctionTag*, int32_t type);
+		static void OpenMenuPapyrus(RE::StaticFunctionTag*, int32_t type, int32_t confirmationClass);
 		// static void CloseMenuPapyrus(RE::StaticFunctionTag*); //cant imaging a situation where you need to close programmatically
 
 		void SanitizeString(std::string& a_str);

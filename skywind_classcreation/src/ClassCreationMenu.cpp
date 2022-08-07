@@ -47,7 +47,9 @@ namespace Scaleform
 	void ClassCreationMenu::Accept(RE::FxDelegateHandler::CallbackProcessor* a_processor)
 	{
 		a_processor->Process("Log", Log);
-		a_processor->Process("OnProceed", OnProceed);
+		a_processor->Process("OnProceedQuiz", OnProceedQuiz);
+		a_processor->Process("OnProceedList", OnProceedList);
+		a_processor->Process("OnProceedCustom", OnProceedCustom);
 		a_processor->Process("OnBack", OnBack);
 	}
 
@@ -182,11 +184,41 @@ namespace Scaleform
 		logger::info("{} swf: {}", Name().data(), a_params[0].GetString());
 	}
 
-	void ClassCreationMenu::OnProceed([[maybe_unused]] const RE::FxDelegateArgs& a_params)
+	void ClassCreationMenu::OnProceedQuiz([[maybe_unused]] const RE::FxDelegateArgs& a_params)
 	{
 		assert(a_params.GetArgCount() == 0);
 		auto menu = static_cast<ClassCreationMenu*>(a_params.GetHandler());
-		menu->OnProceed();
+		menu->OnProceedQuiz();
+	}
+
+	void ClassCreationMenu::OnProceedList([[maybe_unused]] const RE::FxDelegateArgs& a_params)
+	{
+		assert(a_params.GetArgCount() == 1);
+		auto menu = static_cast<ClassCreationMenu*>(a_params.GetHandler());
+		menu->OnProceedList(static_cast<Skywind::Class>(a_params[0].GetNumber()));
+	}
+
+	void ClassCreationMenu::OnProceedCustom([[maybe_unused]] const RE::FxDelegateArgs& a_params)
+	{
+		assert(a_params.GetArgCount() == 12);
+		auto menu = static_cast<ClassCreationMenu*>(a_params.GetHandler());
+		menu->OnProceedCustom(
+			Skywind::CustomClassData{
+				std::make_pair(
+					static_cast<Skywind::Attribute>(a_params[0].GetNumber()),
+					static_cast<Skywind::Attribute>(a_params[1].GetNumber())),
+				static_cast<Skywind::Specialization>(a_params[2].GetNumber()),
+				{
+					static_cast<Skywind::Skill>(a_params[3].GetNumber()),
+					static_cast<Skywind::Skill>(a_params[4].GetNumber()),
+					static_cast<Skywind::Skill>(a_params[5].GetNumber()),
+					static_cast<Skywind::Skill>(a_params[6].GetNumber()),
+					static_cast<Skywind::Skill>(a_params[7].GetNumber()),
+					static_cast<Skywind::Skill>(a_params[8].GetNumber()),
+					static_cast<Skywind::Skill>(a_params[9].GetNumber()),
+					static_cast<Skywind::Skill>(a_params[10].GetNumber()),
+					static_cast<Skywind::Skill>(a_params[11].GetNumber()),
+				} });
 	}
 
 	void ClassCreationMenu::OnBack([[maybe_unused]] const RE::FxDelegateArgs& a_params)
@@ -195,40 +227,6 @@ namespace Scaleform
 		auto menu = static_cast<ClassCreationMenu*>(a_params.GetHandler());
 		menu->OnBack();
 	}
-
-	// void ClassCreationMenu::OnCancel([[maybe_unused]] const RE::FxDelegateArgs& a_params)
-	// {
-	// 	assert(a_params.GetArgCount() == 0);
-
-	// 	Close();
-	// }
-
-	// void ClassCreationMenu::OnTextFocus([[maybe_unused]] const RE::FxDelegateArgs& a_params)
-	// {
-	// 	assert(a_params.GetArgCount() == 0);
-
-	// 	RE::ControlMap* map = RE::ControlMap::GetSingleton();
-	// 	map->AllowTextInput(true);
-	// }
-
-	// void ClassCreationMenu::OnTextUnfocus([[maybe_unused]] const RE::FxDelegateArgs& a_params)
-	// {
-	// 	assert(a_params.GetArgCount() == 0);
-
-	// 	RE::ControlMap* map = RE::ControlMap::GetSingleton();
-	// 	auto menu = static_cast<ClassCreationMenu*>(a_params.GetHandler());
-	// 	map->AllowTextInput(false);
-
-	// 	menu->OnTextUnfocus();
-	// }
-
-	// void ClassCreationMenu::CloseMenu(const RE::FxDelegateArgs& a_params)
-	// {
-	// 	assert(a_params.GetArgCount() == 0);
-
-	// 	auto menu = static_cast<ClassCreationMenu*>(a_params.GetHandler());
-	// 	menu->Close();
-	// }
 
 	void ClassCreationMenu::InitExtensions()
 	{
@@ -241,13 +239,48 @@ namespace Scaleform
 		assert(success);
 	}
 
-	void ClassCreationMenu::OnProceed()
+	void ClassCreationMenu::OnProceedQuiz()
 	{
-		// auto player = RE::PlayerCharacter::GetSingleton();
-		// player->GetObjectReference()->As<RE::TESFullName>()->fullName = RE::BSFixedString(_nameField.Text());
-		// player->AddChange(static_cast<uint32_t>(1<<6)); // found this in race menu function, doesnt seem to be needed
-		// auto player = RE::PlayerCharacter::GetSingleton();
-		// player->charGenRace->GetFullName();
+		Close();
+	}
+
+	void ClassCreationMenu::OnProceedList(Skywind::Class a_class)
+	{
+		auto vm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
+		auto args = RE::MakeFunctionArguments(static_cast<int32_t>(a_class));
+		auto form = RE::TESForm::LookupByEditorID("fbmwChargen");
+
+		auto handle = vm->GetObjectHandlePolicy()->GetHandleForObject(RE::FormType::Quest, form);
+
+		RE::BSTSmartPointer<RE::BSScript::IStackCallbackFunctor> callback;
+		vm->DispatchMethodCall(handle, "fbmw_chargenclasspicklistscript", "ConfirmClass", args, callback);
+
+		Close();
+	}
+
+	void ClassCreationMenu::OnProceedCustom(Skywind::CustomClassData a_data)
+	{
+		auto vm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
+		auto args = RE::MakeFunctionArguments(
+			static_cast<int32_t>(a_data.attributes.first),
+			static_cast<int32_t>(a_data.attributes.second),
+			static_cast<int32_t>(a_data.specialization),
+			static_cast<int32_t>(a_data.skills.at(0)),
+			static_cast<int32_t>(a_data.skills.at(1)),
+			static_cast<int32_t>(a_data.skills.at(2)),
+			static_cast<int32_t>(a_data.skills.at(3)),
+			static_cast<int32_t>(a_data.skills.at(4)),
+			static_cast<int32_t>(a_data.skills.at(5)),
+			static_cast<int32_t>(a_data.skills.at(6)),
+			static_cast<int32_t>(a_data.skills.at(7)),
+			static_cast<int32_t>(a_data.skills.at(8)));
+
+		auto form = RE::TESForm::LookupByEditorID("fbmwChargen");
+		auto handle = vm->GetObjectHandlePolicy()->GetHandleForObject(RE::FormType::Quest, form);
+
+		RE::BSTSmartPointer<RE::BSScript::IStackCallbackFunctor> callback;
+		vm->DispatchMethodCall(handle, "fbmw_chargenclasscustomscript", "ConfirmClass", args, callback);
+
 		Close();
 	}
 
@@ -258,11 +291,12 @@ namespace Scaleform
 
 	void ClassCreationMenu::SetMode()
 	{
+		// interface
 		if (_mode == MenuMode::kCustom) {
 			RE::ControlMap* map = RE::ControlMap::GetSingleton();
 			map->AllowTextInput(true);
 		}
-		
+
 		RE::FxResponseArgs<1> response;
 		RE::GFxValue mode;
 		mode.SetNumber(static_cast<double>(_mode));
@@ -274,6 +308,9 @@ namespace Scaleform
 
 	void ClassCreationMenu::SetInfo()
 	{
+		using AV = RE::ActorValue;
+		using SkyAV = Skywind::ActorValue;
+
 		auto player = RE::PlayerCharacter::GetSingleton();
 
 		RE::FxResponseArgs<3> response;
@@ -285,50 +322,50 @@ namespace Scaleform
 		uiMovie->CreateObject(&attributes);
 		uiMovie->CreateObject(&skills);
 
-		playerStats.SetMember("health", player->GetPermanentActorValue(RE::ActorValue::kHealth));
-		playerStats.SetMember("magicka", player->GetPermanentActorValue(RE::ActorValue::kMagicka));
-		playerStats.SetMember("stamina", player->GetPermanentActorValue(RE::ActorValue::kStamina));
-		playerStats.SetMember("health_regen", player->GetPermanentActorValue(RE::ActorValue::kHealRate));
-		playerStats.SetMember("magicka_regen", player->GetPermanentActorValue(RE::ActorValue::kMagickaRate));
-		playerStats.SetMember("stamina_regen", player->GetPermanentActorValue(RE::ActorValue::KStaminaRate));
-		playerStats.SetMember("carry_weight", player->GetPermanentActorValue(RE::ActorValue::kCarryWeight));
+		playerStats.SetMember("health", player->GetPermanentActorValue(AV::kHealth));
+		playerStats.SetMember("magicka", player->GetPermanentActorValue(AV::kMagicka));
+		playerStats.SetMember("stamina", player->GetPermanentActorValue(AV::kStamina));
+		playerStats.SetMember("health_regen", player->GetPermanentActorValue(AV::kHealRate));
+		playerStats.SetMember("magicka_regen", player->GetPermanentActorValue(AV::kMagickaRate));
+		playerStats.SetMember("stamina_regen", player->GetPermanentActorValue(AV::KStaminaRate));
+		playerStats.SetMember("carry_weight", player->GetPermanentActorValue(AV::kCarryWeight));
 
-		attributes.SetMember("strength", player->GetPermanentActorValue(static_cast<RE::ActorValue>(SkywindAVs::kStrength)));
-		attributes.SetMember("intelligence", player->GetPermanentActorValue(static_cast<RE::ActorValue>(SkywindAVs::kIntelligence)));
-		attributes.SetMember("willpower", player->GetPermanentActorValue(static_cast<RE::ActorValue>(SkywindAVs::kWillpower)));
-		attributes.SetMember("endurance", player->GetPermanentActorValue(static_cast<RE::ActorValue>(SkywindAVs::kEndurance)));
-		attributes.SetMember("agility", player->GetPermanentActorValue(static_cast<RE::ActorValue>(SkywindAVs::kAgility)));
-		attributes.SetMember("speed", player->GetPermanentActorValue(static_cast<RE::ActorValue>(SkywindAVs::kSpeed)));
-		attributes.SetMember("personality", player->GetPermanentActorValue(static_cast<RE::ActorValue>(SkywindAVs::kPersonality)));
-		attributes.SetMember("luck", player->GetPermanentActorValue(static_cast<RE::ActorValue>(SkywindAVs::kLuck)));
+		attributes.SetMember("strength", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kStrength)));
+		attributes.SetMember("intelligence", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kIntelligence)));
+		attributes.SetMember("willpower", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kWillpower)));
+		attributes.SetMember("endurance", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kEndurance)));
+		attributes.SetMember("agility", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kAgility)));
+		attributes.SetMember("speed", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kSpeed)));
+		attributes.SetMember("personality", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kPersonality)));
+		attributes.SetMember("luck", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kLuck)));
 
-		skills.SetMember("athletics", player->GetPermanentActorValue(static_cast<RE::ActorValue>(kAxe)));
-		skills.SetMember("axe", player->GetPermanentActorValue(static_cast<RE::ActorValue>(kBlock)));
-		skills.SetMember("block", player->GetPermanentActorValue(static_cast<RE::ActorValue>(kBlunt)));
-		skills.SetMember("blunt_weapon", player->GetPermanentActorValue(static_cast<RE::ActorValue>(kHeavyArmor)));
-		skills.SetMember("heavy_armor", player->GetPermanentActorValue(static_cast<RE::ActorValue>(kLongBlade)));
-		skills.SetMember("long_blade", player->GetPermanentActorValue(static_cast<RE::ActorValue>(kMediumArmor)));
-		skills.SetMember("medium_armor", player->GetPermanentActorValue(static_cast<RE::ActorValue>(kPolearm)));
-		skills.SetMember("polearms", player->GetPermanentActorValue(static_cast<RE::ActorValue>(kSmithing)));
-		skills.SetMember("smithing", player->GetPermanentActorValue(static_cast<RE::ActorValue>(kAthletics)));
-		skills.SetMember("alchemy", player->GetPermanentActorValue(static_cast<RE::ActorValue>(kAlchemy)));
-		skills.SetMember("alteration", player->GetPermanentActorValue(static_cast<RE::ActorValue>(kAlteration)));
-		skills.SetMember("conjuration", player->GetPermanentActorValue(static_cast<RE::ActorValue>(kConjuration)));
-		skills.SetMember("destruction", player->GetPermanentActorValue(static_cast<RE::ActorValue>(kDestruction)));
-		skills.SetMember("enchant", player->GetPermanentActorValue(static_cast<RE::ActorValue>(kEnchanting)));
-		skills.SetMember("illusion", player->GetPermanentActorValue(static_cast<RE::ActorValue>(kIllusion)));
-		skills.SetMember("mysticism", player->GetPermanentActorValue(static_cast<RE::ActorValue>(kMysticism)));
-		skills.SetMember("restoration", player->GetPermanentActorValue(static_cast<RE::ActorValue>(kRestoration)));
-		skills.SetMember("unarmored", player->GetPermanentActorValue(static_cast<RE::ActorValue>(kUnarmorerd)));
-		skills.SetMember("acrobatics", player->GetPermanentActorValue(static_cast<RE::ActorValue>(kHandToHand)));
-		skills.SetMember("hand_to_hand", player->GetPermanentActorValue(static_cast<RE::ActorValue>(kLightArmor)));
-		skills.SetMember("light_armor", player->GetPermanentActorValue(static_cast<RE::ActorValue>(KMarksman)));
-		skills.SetMember("marksman", player->GetPermanentActorValue(static_cast<RE::ActorValue>(kSecurity)));
-		skills.SetMember("mercantile", player->GetPermanentActorValue(static_cast<RE::ActorValue>(kShortBlade)));
-		skills.SetMember("security", player->GetPermanentActorValue(static_cast<RE::ActorValue>(kSneak)));
-		skills.SetMember("short_blade", player->GetPermanentActorValue(static_cast<RE::ActorValue>(kMercantile)));
-		skills.SetMember("sneak", player->GetPermanentActorValue(static_cast<RE::ActorValue>(kAcrobatics)));
-		skills.SetMember("speechcraft", player->GetPermanentActorValue(static_cast<RE::ActorValue>(kSpeechcraft)));
+		skills.SetMember("athletics", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kAxe)));
+		skills.SetMember("axe", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kBlock)));
+		skills.SetMember("block", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kBlunt)));
+		skills.SetMember("blunt_weapon", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kHeavyArmor)));
+		skills.SetMember("heavy_armor", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kLongBlade)));
+		skills.SetMember("long_blade", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kMediumArmor)));
+		skills.SetMember("medium_armor", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kPolearm)));
+		skills.SetMember("polearms", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kSmithing)));
+		skills.SetMember("smithing", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kAthletics)));
+		skills.SetMember("alchemy", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kAlchemy)));
+		skills.SetMember("alteration", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kAlteration)));
+		skills.SetMember("conjuration", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kConjuration)));
+		skills.SetMember("destruction", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kDestruction)));
+		skills.SetMember("enchant", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kEnchanting)));
+		skills.SetMember("illusion", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kIllusion)));
+		skills.SetMember("mysticism", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kMysticism)));
+		skills.SetMember("restoration", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kRestoration)));
+		skills.SetMember("unarmored", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kUnarmorerd)));
+		skills.SetMember("acrobatics", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kHandToHand)));
+		skills.SetMember("hand_to_hand", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kLightArmor)));
+		skills.SetMember("light_armor", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kMarksman)));
+		skills.SetMember("marksman", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kSecurity)));
+		skills.SetMember("mercantile", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kShortBlade)));
+		skills.SetMember("security", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kSneak)));
+		skills.SetMember("short_blade", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kMercantile)));
+		skills.SetMember("sneak", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kAcrobatics)));
+		skills.SetMember("speechcraft", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kSpeechcraft)));
 
 		response.Add(playerStats);
 		response.Add(attributes);
@@ -347,7 +384,7 @@ namespace Scaleform
 		}
 	}
 
-	void ClassCreationMenu::OpenMenuPapyrus(RE::StaticFunctionTag*, int32_t mode)
+	void ClassCreationMenu::OpenMenuPapyrus(RE::StaticFunctionTag*, int32_t mode,[[maybe_unused]] int32_t confirmationClass)
 	{
 		assert(mode >= 0 && mode <= 2);
 		_mode = static_cast<MenuMode>(mode);

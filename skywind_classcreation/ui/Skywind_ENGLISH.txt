@@ -114,6 +114,9 @@ $SHORT_BLADE_DESC	Characters with great Short Blade skill are more effective wit
 $SNEAK_DESC	The Sneak discipline is the art of moving unseen and unheard. Skilled sneaks are also adept pickpockets. Note that the skill does not improve simply from use and having the "sneak icon" on the screen. Despite the icon display, the skill only improves when within the detection range of a creature where they would notice the player. Sneak is a very useful skill, as it allows for critical hits.
 $SPEECHCRAFT_DESC	Those skilled in the art of Speechcraft influence others by admiring, intimidating, and taunting them. Listeners are more willing to divulge information or to entrust important tasks to the skilled speaker.
 $SPECIALIZATION	SPECIALIZATION
+$COMBAT	Combat
+$MAGIC	Magic
+$STEALTH	Stealth
 $MAJOR_SKILLS	MAJOR SKILLS
 $HEALTH_REGEN	Health Regen
 $MAGICKA_REGEN	Magicka Regen

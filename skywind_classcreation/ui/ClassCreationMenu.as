@@ -47,9 +47,9 @@ class ClassCreationMenu extends MovieClip {
     private var witchhunter:ClassCreationButton;
 
     // specialization
-    private var specWarrior:ClassCreationButton;
-    private var specMage:ClassCreationButton;
-    private var specThief:ClassCreationButton;
+    private var combat:ClassCreationButton;
+    private var magic:ClassCreationButton;
+    private var stealth:ClassCreationButton;
 
     // attributes
     private var agility:ClassCreationButton;
@@ -124,7 +124,7 @@ class ClassCreationMenu extends MovieClip {
     private var _numSkills:Number = 0;
     private var _classButtons:Array;
     private var _specButtons:Array;
-    private var _attributeButtons:Array;
+    private var _attrButtons:Array;
     private var _skillButtons:Array;
     private var _stats:Array;
 
@@ -152,8 +152,8 @@ class ClassCreationMenu extends MovieClip {
             thief,
             warrior,
             witchhunter];
-        _specButtons = [specWarrior, specMage, specThief];
-        _attributeButtons = [agility,
+        _specButtons = [combat, magic, stealth];
+        _attrButtons = [agility,
             endurance,
             intelligence,
             luck,
@@ -188,7 +188,6 @@ class ClassCreationMenu extends MovieClip {
             short_blade,
             sneak,
             speechcraft];
-
         _stats = [health,
             magicka,
             stamina,
@@ -200,12 +199,12 @@ class ClassCreationMenu extends MovieClip {
 
     public function onLoad():Void {
         super.onLoad();
-        // GameDelegate.addCallBack("SetRace", this, "SetRace");
         GameDelegate.addCallBack("SetInfo", this, "SetInfo");
         GameDelegate.addCallBack("SetMode", this, "SetMode");
 
+        // SetMode(QUIZ);
         // SetMode(LIST);
-        SetMode(CUSTOM);
+        // SetMode(CUSTOM);
 
         var loader = new LoadVars();
         loader.onData = Delegate.create(this, completeLoad);
@@ -226,9 +225,9 @@ class ClassCreationMenu extends MovieClip {
                 // _specButtons[i].addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
         }
 
-        for (var i = 0; i < _attributeButtons.length; i++) {
-            _attributeButtons[i].addEventListener(EventTypes.SELECT, this, "handleAttributePress");
-            _attributeButtons[i].addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
+        for (var i = 0; i < _attrButtons.length; i++) {
+            _attrButtons[i].addEventListener(EventTypes.SELECT, this, "handleAttributePress");
+            _attrButtons[i].addEventListener(EventTypes.ROLL_OVER, this, "handleButtonHover");
         }
 
         for (var i = 0; i < _skillButtons.length; i++) {
@@ -257,8 +256,8 @@ class ClassCreationMenu extends MovieClip {
         for (var i = 0; i < _specButtons.length; i++) {
             _specButtons[i].disabled = (_mode != CUSTOM);
         }
-        for (var i = 0; i < _attributeButtons.length; i++) {
-            _attributeButtons[i].disabled = (_mode != CUSTOM);
+        for (var i = 0; i < _attrButtons.length; i++) {
+            _attrButtons[i].disabled = (_mode != CUSTOM);
         }
         for (var i = 0; i < _skillButtons.length; i++) {
             _skillButtons[i].disabled = (_mode != CUSTOM);
@@ -290,8 +289,8 @@ class ClassCreationMenu extends MovieClip {
         for (var i = 0; i < _stats.length; i++) {
             _state[_stats[i]._name] = statsArg[_stats[i]._name];
         }
-        for (var i = 0; i < _attributeButtons.length; i++) {
-            _state[_attributeButtons[i]._name] = attrArg[_attributeButtons[i]._name];
+        for (var i = 0; i < _attrButtons.length; i++) {
+            _state[_attrButtons[i]._name] = attrArg[_attrButtons[i]._name];
         }
         for (var i = 0; i < _skillButtons.length; i++) {
             _state[_skillButtons[i]._name] = skillArg[_skillButtons[i]._name];
@@ -301,7 +300,41 @@ class ClassCreationMenu extends MovieClip {
     }
 
     private function handleProceedPress(a_event:Object) {
-        GameDelegate.call("OnProceed", []);
+        if (_mode == QUIZ) {
+            GameDelegate.call("OnProceedQuiz", []);
+            return;
+        }
+
+        if (_mode == LIST) {
+            for (var i = 0; i < _classButtons.length; i++) {
+                if (_classButtons[i].selected) {
+                    GameDelegate.call("OnProceedList", [i]);
+                    return;
+                }
+            }
+        }
+
+        if (_mode == CUSTOM) {
+            var args:Array = [];
+            for (var i = 0; i < _attrButtons.length; i++) {
+                if (_attrButtons[i].selected) {
+                    args.push(i);
+                }
+            }
+            for (var i = 0; i < _specButtons.length; i++) {
+                if (_specButtons[i].selected) {
+                    args.push(i);
+                }
+            }
+            for (var i = 0; i < _skillButtons.length; i++) {
+                if (_skillButtons[i].selected) {
+                    args.push(i);
+                }
+            }
+
+            GameDelegate.call("OnProceedCustom", args);
+            return;
+        }
     }
 
     private function handleBackPress(a_event:Object) {
@@ -324,8 +357,8 @@ class ClassCreationMenu extends MovieClip {
         if (a_event.target.selected) {
             _numAttributes += 1;
             if (_mode == CUSTOM && _numAttributes == 2) {
-                for (var i = 0; i < _attributeButtons.length; i++) {
-                    var button = _attributeButtons[i];
+                for (var i = 0; i < _attrButtons.length; i++) {
+                    var button = _attrButtons[i];
                     if (!button.selected) {
                         button.disabled = true;
                     }
@@ -334,8 +367,8 @@ class ClassCreationMenu extends MovieClip {
         } else {
             _numAttributes -= 1;
             if (_mode == CUSTOM && _numAttributes == 1) {
-                for (var i = 0; i < _attributeButtons.length; i++) {
-                    _attributeButtons[i].disabled = false;
+                for (var i = 0; i < _attrButtons.length; i++) {
+                    _attrButtons[i].disabled = false;
                 }
             }
         }
@@ -380,9 +413,15 @@ class ClassCreationMenu extends MovieClip {
             _classButtons[i].texts.textField.text = _translate("$" + _classButtons[i]._name.toUpperCase());
         }
 
-        for (var i = 0; i < _attributeButtons.length; i++) {
-            _attributeButtons[i].texts.textField.text = _translate("$" + _attributeButtons[i]._name.toUpperCase(), true);
+        for (var i = 0; i < _attrButtons.length; i++) {
+            _attrButtons[i].texts.textField.text = _translate("$" + _attrButtons[i]._name.toUpperCase(), true);
         }
+
+        for (var i = 0; i < _specButtons.length; i++) {
+            _specButtons[i].texts.textField.text = _translate("$" + _specButtons[i]._name.toUpperCase());
+            _specButtons[i].texts.textField.autoSize = "center";
+        }
+
 
         for (var i = 0; i < _skillButtons.length; i++) {
             _skillButtons[i].texts.textField.text = _translate("$" + _skillButtons[i]._name.toUpperCase());
@@ -392,15 +431,6 @@ class ClassCreationMenu extends MovieClip {
             _stats[i].textField.text = _translate("$" + _stats[i]._name.toUpperCase(), true);
         }
 
-
-        specWarrior.texts.textField.autoSize = "center";
-        specMage.texts.textField.autoSize = "center";
-        specThief.texts.textField.autoSize = "center";
-        specWarrior.texts.textField.text = _translate("$WARRIOR");
-        specMage.texts.textField.text = _translate("$MAGE");
-        specThief.texts.textField.text = _translate("$THIEF");
-
-
         back.texts.textField.text = _translate("$BACK");
         proceed.texts.textField.text = _translate("$PROCEED");
     }
@@ -408,9 +438,9 @@ class ClassCreationMenu extends MovieClip {
     private function calculateBonuses() {
         var state_copy = _clone(_state);
         // add selected buttons
-        for (var i in _attributeButtons) {
-            if (_attributeButtons[i].selected) {
-                state_copy[_attributeButtons[i]._name] += 10;
+        for (var i in _attrButtons) {
+            if (_attrButtons[i].selected) {
+                state_copy[_attrButtons[i]._name] += 10;
             }
         }
         for (var i in _skillButtons) {
@@ -421,15 +451,15 @@ class ClassCreationMenu extends MovieClip {
 
 
         // add bonus from specialization
-        if (specWarrior.selected) {
+        if (combat.selected) {
             for (var i = 0; i < 9; i++) {
                 state_copy[_skillButtons[i]._name] += 5;
             }
-        } else if (specMage.selected) {
+        } else if (magic.selected) {
             for (var i = 9; i < 18; i++) {
                 state_copy[_skillButtons[i]._name] += 5;
             }
-        } else if (specThief.selected) {
+        } else if (stealth.selected) {
             for (var i = 18; i < 27; i++) {
                 state_copy[_skillButtons[i]._name] += 5;
             }
@@ -453,9 +483,9 @@ class ClassCreationMenu extends MovieClip {
 
     private function unselectAll() {
         // might be a more efficient way but fuck it :)
-        for (var i = 0; i < _attributeButtons.length; i++) {
-            if (_attributeButtons[i].selected) {
-                _attributeButtons[i].selected = false;
+        for (var i = 0; i < _attrButtons.length; i++) {
+            if (_attrButtons[i].selected) {
+                _attrButtons[i].selected = false;
             }
         }
         for (var i = 0; i < _skillButtons.length; i++) {
