@@ -14,9 +14,6 @@ import gfx.events.EventTypes;
 // last todo:
 // add remaining art once finished
 // writing for classes and skills
-// proceed only available when filled out in custom mode
-// pass on text for class name and description
-// format stats
 
 class ClassCreationMenu extends MovieClip {
     public static var QUIZ = 0;
@@ -232,6 +229,8 @@ class ClassCreationMenu extends MovieClip {
         ///
         proceed.addEventListener(EventTypes.CLICK, this, "handleProceedPress");
         back.addEventListener(EventTypes.CLICK, this, "handleBackPress");
+
+        proceed.disabled = true;
     }
 
     public function InitExtensions():Void {
@@ -286,7 +285,10 @@ class ClassCreationMenu extends MovieClip {
     private function SetInfo(statsArg:Object, attrArg:Object, skillArg:Object) {
         // sets the initial info
         for (var i = 0; i < _stats.length; i++) {
-            _state[_stats[i]._name] = statsArg[_stats[i]._name];
+            _state[_stats[i]._name] = Math.round(statsArg[_stats[i]._name]);
+            if (i >= 3 && i <= 5) {
+                _state[_stats[i]._name] += "/s"
+            }
         }
         for (var i = 0; i < _attrButtons.length; i++) {
             _state[_attrButtons[i]._name] = attrArg[_attrButtons[i]._name];
@@ -330,6 +332,8 @@ class ClassCreationMenu extends MovieClip {
                     args.push(i);
                 }
             }
+            args.push(custom.textOrDefault)
+            args.push(class_description.textOrDefault)
 
             GameDelegate.call("OnProceedCustom", args);
             return;
@@ -449,35 +453,42 @@ class ClassCreationMenu extends MovieClip {
 
     private function calculateBonuses() {
         var state_copy = _clone(_state);
+        var proceed_counter = 0;
+
         // add selected buttons
         for (var i in _attrButtons) {
             if (_attrButtons[i].selected) {
                 state_copy[_attrButtons[i]._name] += 10;
+                proceed_counter++;
             }
         }
         for (var i in _skillButtons) {
             if (_skillButtons[i].selected) {
                 state_copy[_skillButtons[i]._name] += 10;
+                proceed_counter++;
             }
         }
-
 
         // add bonus from specialization
         if (combat.selected) {
             for (var i = 0; i < 9; i++) {
                 state_copy[_skillButtons[i]._name] += 5;
             }
+            proceed_counter++;
         } else if (magic.selected) {
             for (var i = 9; i < 18; i++) {
                 state_copy[_skillButtons[i]._name] += 5;
             }
+            proceed_counter++;
         } else if (stealth.selected) {
             for (var i = 18; i < 27; i++) {
                 state_copy[_skillButtons[i]._name] += 5;
             }
+            proceed_counter++;
         }
 
         // update values on menu
+        proceed.disabled = (proceed_counter != 12);
         for (var name in state_copy) {
             this[name].value = state_copy[name];
         }

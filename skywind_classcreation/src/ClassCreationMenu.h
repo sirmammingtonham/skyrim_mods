@@ -102,8 +102,8 @@ namespace Scaleform
 			Specialization specialization;
 			std::array<Skill, 9> skills;
 
-			std::string name;
-			std::string description;
+			std::string_view name;
+			std::string_view description;
 		};
 
 		enum ActorValue

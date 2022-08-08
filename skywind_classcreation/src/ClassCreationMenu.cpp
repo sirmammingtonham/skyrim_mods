@@ -149,7 +149,7 @@ namespace Scaleform
 
 	void ClassCreationMenu::OnProceedCustom([[maybe_unused]] const RE::FxDelegateArgs& a_params)
 	{
-		assert(a_params.GetArgCount() == 12);
+		assert(a_params.GetArgCount() == 14);
 		auto menu = static_cast<ClassCreationMenu*>(a_params.GetHandler());
 		menu->OnProceedCustom(
 			Skywind::CustomClassData{
@@ -167,7 +167,10 @@ namespace Scaleform
 					static_cast<Skywind::Skill>(a_params[9].GetNumber()),
 					static_cast<Skywind::Skill>(a_params[10].GetNumber()),
 					static_cast<Skywind::Skill>(a_params[11].GetNumber()),
-				} });
+				},
+				std::string_view(a_params[12].GetString()),
+				std::string_view(a_params[13].GetString())
+				 });
 	}
 
 	void ClassCreationMenu::OnBack([[maybe_unused]] const RE::FxDelegateArgs& a_params)
@@ -211,6 +214,8 @@ namespace Scaleform
 	{
 		auto vm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
 		auto args = RE::MakeFunctionArguments(
+			RE::BSFixedString(a_data.name),
+			RE::BSFixedString(a_data.description),
 			static_cast<int32_t>(a_data.attributes.first),
 			static_cast<int32_t>(a_data.attributes.second),
 			static_cast<int32_t>(a_data.specialization),

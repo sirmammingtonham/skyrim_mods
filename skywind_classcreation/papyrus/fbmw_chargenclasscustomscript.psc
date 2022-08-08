@@ -25,7 +25,7 @@ Function CreateCustomClass()
 	Skywind.OpenClassMenu(-2);
 EndFunction
 
-Function ConfirmClass(int Attribute01, int Attribute02, int Specialization, int Skill01, int Skill02, int Skill03, int Skill04, int Skill05, int Skill06, int Skill07, int Skill08, int Skill09)
+Function ConfirmClass(string Name, string Description, int Attribute01, int Attribute02, int Specialization, int Skill01, int Skill02, int Skill03, int Skill04, int Skill05, int Skill06, int Skill07, int Skill08, int Skill09)
 	string[] SpecializationList = new string[3]
 	SpecializationList[0] = "Combat"
 	SpecializationList[1] = "Magic"
@@ -188,8 +188,9 @@ Function ConfirmClass(int Attribute01, int Attribute02, int Specialization, int 
 		BaseScript.SkillsScript.fbmwClassSpeechcraftScore.SetValue(1)
 	endif
 
-	; todo
-	BaseScript.SendClassInfo("Adventurer", SpecializationList[Specialization], AttributeList[Attribute01], AttributeList[Attribute02], \
+	; todo add description
+	Debug.trace(Description)
+	BaseScript.SendClassInfo(Name, SpecializationList[Specialization], AttributeList[Attribute01], AttributeList[Attribute02], \
 								SkillList[Skill01], SkillList[Skill02], SkillList[Skill03], SkillList[Skill04], SkillList[Skill05], \
 								SkillList[Skill06], SkillList[Skill07], SkillList[Skill08])
 	if GetStage()>10

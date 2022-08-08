@@ -17,6 +17,13 @@ class ClassCreationTextInput extends TextInput {
         }
     }
 
+    public function get textOrDefault() {
+        if (text == "") {
+            return defaultText;
+        }
+        return text;
+    }
+
     private function changeFocus():Void {
         super.changeFocus();
         if (_focused) {
