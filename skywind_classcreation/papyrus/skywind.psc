@@ -8,4 +8,4 @@ float Function GetCompassAlpha() global native
 Function ShowCrosshair() global native
 Function HideCrosshair() global native
 Function OpenNamePrompt() global native
-Function OpenClassMenu(int mode, int class) global native
+Function OpenClassMenu(int mode) global native

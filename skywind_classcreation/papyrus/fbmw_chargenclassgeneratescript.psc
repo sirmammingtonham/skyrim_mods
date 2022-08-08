@@ -22,8 +22,9 @@ Function GenerateClass()
 	UI.OpenCustomMenu("classquizmenu")
 endFunction
 
-Event onClassQuizMenuClose(string eventName, string strArg, float class, Form sender)
-	BaseScript.ConfirmClass(class as int)
-	; open class menu in confirmation mode (mode 0)
-	Skywind.OpenClassMenu(0, class as int)
+Event onClassQuizMenuClose(string eventName, string strArg, float classId, Form sender)
+	; open class menu in confirmation mode and pass classid
+	Skywind.OpenClassMenu(classId as int)
+	BaseScript.ConfirmClass(classId as int)
 EndEvent
+

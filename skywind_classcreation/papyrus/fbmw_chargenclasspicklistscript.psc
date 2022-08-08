@@ -19,12 +19,11 @@ endFunction
 
 ;========== Classes sorted by specialization ==========
 Function PickFromClassList()
-	; open custom menu in class list mode (mode 1)
-	; second arg is only needed for confirmation mode so set to -1 why not
-	Skywind.OpenClassMenu(1, -1)
+	; open custom menu in class list mode (mode -1)
+	Skywind.OpenClassMenu(-1)
 endFunction
 
 ; function is called from plugin once proceed is pressed in menu
-Function ConfirmClass(int class)
-	BaseScript.ConfirmClass(class)
+Function ConfirmClass(int classId)
+	BaseScript.ConfirmClass(classId)
 endFunction

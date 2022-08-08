@@ -175,12 +175,31 @@ namespace Scaleform
 		static constexpr char SWF_NAME[] = "classcreationmenu";
 		enum MenuMode
 		{
-			kQuiz = 0,
-			kList,
-			kCustom,
+			kCustom = -2,
+			kList = -1,
+			kConfirmAcrobat = 0,
+			kConfirmAgent,
+			kConfirmArcher,
+			kConfirmAssassin,
+			kConfirmBarbarian,
+			kConfirmBard,
+			kConfirmBattlemage,
+			kConfirmCrusader,
+			kConfirmHealer,
+			kConfirmKnight,
+			kConfirmMage,
+			kConfirmMonk,
+			kConfirmNightblade,
+			kConfirmPilgrim,
+			kConfirmRogue,
+			kConfirmScout,
+			kConfirmSorcerer,
+			kConfirmSpellsword,
+			kConfirmThief,
+			kConfirmWarrior,
+			kConfirmWitchhunter,
 		};
 		static MenuMode _mode;
-		// CLIK::TextField _;
 
 	public:
 		using Base = RE::IMenu;
@@ -203,8 +222,6 @@ namespace Scaleform
 		static RE::IMenu* Create();
 		static bool RegisterFuncs(RE::BSScript::IVirtualMachine* a_vm);
 
-		static bool Exec(const RE::SCRIPT_PARAMETER* a_paramInfo, RE::SCRIPT_FUNCTION::ScriptData* a_scriptData, RE::TESObjectREFR* a_thisObj, RE::TESObjectREFR* a_containingObj, RE::Script* a_scriptObj, RE::ScriptLocals* a_locals, double& a_result, uint32_t& a_opcodeOffsetPtr);
-		// static void Register();
 
 	private:
 		void OnMenuOpenMessage();
@@ -228,7 +245,7 @@ namespace Scaleform
 		void SetInfo();
 
 		// papyrus register helpers
-		static void OpenMenuPapyrus(RE::StaticFunctionTag*, int32_t type, int32_t confirmationClass);
+		static void OpenMenuPapyrus(RE::StaticFunctionTag*, int32_t mode);
 		// static void CloseMenuPapyrus(RE::StaticFunctionTag*); //cant imaging a situation where you need to close programmatically
 
 		void SanitizeString(std::string& a_str);

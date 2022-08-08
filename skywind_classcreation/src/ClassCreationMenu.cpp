@@ -108,63 +108,12 @@ namespace Scaleform
 		uiQueue->AddMessage(Name(), RE::UI_MESSAGE_TYPE::kHide, 0);
 	}
 
-	bool ClassCreationMenu::Exec([[maybe_unused]] const RE::SCRIPT_PARAMETER* a_paramInfo, [[maybe_unused]] RE::SCRIPT_FUNCTION::ScriptData* a_scriptData, [[maybe_unused]] RE::TESObjectREFR* a_thisObj, [[maybe_unused]] RE::TESObjectREFR* a_containingObj, [[maybe_unused]] RE::Script* a_scriptObj, [[maybe_unused]] RE::ScriptLocals* a_locals, [[maybe_unused]] double& a_result, [[maybe_unused]] uint32_t& a_opcodeOffsetPtr)
-	{
-		std::string str("yeehaw");
-		auto task = SKSE::GetTaskInterface();
-		task->AddTask([str]() {
-			auto console = RE::ConsoleLog::GetSingleton();
-			if (console) {
-				console->Print(str.c_str());
-			}
-		});
-
-		Open();
-
-		// auto selectedRefHandle = RE::Console::GetSelectedRef();
-		// RE::TESObjectREFRPtr selectedRef;
-		// RE::TESObjectREFR::LookupByHandle(selectedRefHandle, selectedRef);
-		// if (!selectedRef) {
-		// 	CPrint("> [%s] ERROR: No selected reference", LONG_NAME);
-		// 	return true;
-		// }
-
-		// auto strChunk = a_scriptData->GetStringChunk();
-		// auto comment = strChunk->GetString();
-		// _ref = selectedRef.get();
-		// LogComment(comment);
-		// _ref = 0;
-
-		return true;
-	}
-
 	void ClassCreationMenu::Register()
 	{
 		auto ui = RE::UI::GetSingleton();
 		ui->Register(Name(), Create);
 
 		logger::info("Registered {} (pls work)", Name().data());
-		auto info = RE::SCRIPT_FUNCTION::LocateConsoleCommand("BetaComment");  // Unused
-		if (info) {
-			// static RE::SCRIPT_PARAMETER params[] = {
-			// 	// { "String", RE::SCRIPT_PARAMETER::Type::kString, 0 }
-			// };
-
-			info->functionName = "OpenClassMenu";
-			info->shortName = "OCM";
-			info->helpString = "heehhehhehhe";
-			info->referenceFunction = false;
-			// info->SetParameters(params);
-			info->executeFunction = &Exec;
-			info->params = 0;
-			info->numParams = 0;
-			info->conditionFunction = 0;
-			info->editorFilter = 0;
-
-			logger::info("success");
-		} else {
-			logger::info("failure");
-		}
 	}
 
 	RE::IMenu* ClassCreationMenu::Create()
@@ -384,7 +333,7 @@ namespace Scaleform
 		}
 	}
 
-	void ClassCreationMenu::OpenMenuPapyrus(RE::StaticFunctionTag*, int32_t mode,[[maybe_unused]] int32_t confirmationClass)
+	void ClassCreationMenu::OpenMenuPapyrus(RE::StaticFunctionTag*, int32_t mode)
 	{
 		assert(mode >= 0 && mode <= 2);
 		_mode = static_cast<MenuMode>(mode);

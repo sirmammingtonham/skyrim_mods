@@ -124,3 +124,6 @@ $STAMINA_REGEN	Stamina Regen
 $CARRY_WEIGHT	Carry Weight
 $BACK	BACK
 $PROCEED	PROCEED
+$CLASS_QUIZ_TITLE	Your past and personality reflect a
+$CLASS_LIST_TITLE	What is your class?
+$CLASS_CUSTOM_TITLE	Create a custom class

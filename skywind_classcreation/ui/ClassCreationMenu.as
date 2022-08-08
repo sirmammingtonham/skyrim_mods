@@ -8,15 +8,15 @@ import Shared.GlobalFunc;
 import skyui.defines.Input;
 import skyui.util.Translator;
 
-import mx.utils.Delegate;
-
 import gfx.events.EventDispatcher;
 import gfx.events.EventTypes;
 
 // last todo:
 // add remaining art once finished
 // writing for classes and skills
-// hook up to papyrus
+// proceed only available when filled out in custom mode
+// pass on text for class name and description
+// format stats
 
 class ClassCreationMenu extends MovieClip {
     public static var QUIZ = 0;
@@ -102,6 +102,7 @@ class ClassCreationMenu extends MovieClip {
     private var carry_weight:MovieClip;
 
     // other stuff
+    private var title:MovieClip;
     private var attributes_si:MovieClip;
     private var skills_si:MovieClip;
 
@@ -116,7 +117,6 @@ class ClassCreationMenu extends MovieClip {
     private var skill_description:TextField;
 
     private var _state:Object = new Object();
-    private var _data:Object;
 
     /////
     private var _mode:Number = 2;
@@ -127,6 +127,8 @@ class ClassCreationMenu extends MovieClip {
     private var _attrButtons:Array;
     private var _skillButtons:Array;
     private var _stats:Array;
+
+    /////
 
     public function ClassCreationMenu() {
         super();
@@ -203,16 +205,8 @@ class ClassCreationMenu extends MovieClip {
         GameDelegate.addCallBack("SetMode", this, "SetMode");
 
         // SetMode(QUIZ);
-        // SetMode(LIST);
-        // SetMode(CUSTOM);
-
-        var loader = new LoadVars();
-        loader.onData = Delegate.create(this, completeLoad);
-        loader.load("class_data.json");
-    }
-
-    private function completeLoad(raw:String) {
-        _data = JSON.parse(raw);
+        // SetMode(-1);
+        // SetMode(-2);
 
         this.setButtonText();
 
@@ -248,8 +242,18 @@ class ClassCreationMenu extends MovieClip {
         return true;
     }
 
-    public function SetMode(mode:Number) {
-        _mode = mode;
+    public function SetMode(x:Number) {
+        if (x == -2) {
+            _mode = CUSTOM;
+        } else if (x == -1) {
+            _mode = LIST;
+            acrobat.selected = true; // default value
+        } else {
+            _mode = QUIZ;
+            _classButtons[x].selected = true;
+        }
+        setTitle(x);
+
         for (var i = 0; i < _classButtons.length; i++) {
             _classButtons[i].disabled = (_mode != LIST);
         }
@@ -271,16 +275,11 @@ class ClassCreationMenu extends MovieClip {
             class_art.gotoAndStop("custom");
         } else {
             class_description.disabled = true;
+            custom.swapDepths(acrobat);
             custom.disabled = true;
             custom._alpha = 0.0;
             attributes_si._alpha = 70;
             skills_si._alpha = 70;
-        }
-
-
-        //// default value
-        if (_mode == LIST) {
-            acrobat.selected = true;
         }
     }
 
@@ -343,10 +342,10 @@ class ClassCreationMenu extends MovieClip {
 
     private function handleClassPress(a_event:Object) {
         unselectAll();
-        selectAll(_data["class_presets"][a_event.target._name]);
+        selectAll(ClassMenuPresets[a_event.target._name]);
 
         class_art.gotoAndStop(a_event.target._name);
-        class_description.text = _translate("$" + a_event.target._name.toUpperCase() + "_DESC");
+        class_description.text = "$" + a_event.target._name.toUpperCase() + "_DESC";
     }
 
     private function handleSpecializationPress(a_event:Object) {
@@ -403,36 +402,49 @@ class ClassCreationMenu extends MovieClip {
 
     private function handleButtonHover(a_event:Object) {
         skill_art.gotoAndStop(a_event.target._name);
-        skill_description.text = _translate("$" + a_event.target._name.toUpperCase() + "_DESC");
+        skill_description.text = "$" + a_event.target._name.toUpperCase() + "_DESC";
     }
 
     private function setButtonText() {
         skill_description.text = ""; // todo: change to default
 
         for (var i = 0; i < _classButtons.length; i++) {
-            _classButtons[i].texts.textField.text = _translate("$" + _classButtons[i]._name.toUpperCase());
+            _classButtons[i].texts.textField.text = "$" + _classButtons[i]._name.toUpperCase();
         }
 
         for (var i = 0; i < _attrButtons.length; i++) {
-            _attrButtons[i].texts.textField.text = _translate("$" + _attrButtons[i]._name.toUpperCase(), true);
+            _attrButtons[i].texts.textField.text = toTitleCase(Translator.translate("$" + _attrButtons[i]._name.toUpperCase()));
         }
 
         for (var i = 0; i < _specButtons.length; i++) {
-            _specButtons[i].texts.textField.text = _translate("$" + _specButtons[i]._name.toUpperCase());
+            _specButtons[i].texts.textField.text = toTitleCase(Translator.translate("$" + _specButtons[i]._name.toUpperCase()));
             _specButtons[i].texts.textField.autoSize = "center";
         }
 
 
         for (var i = 0; i < _skillButtons.length; i++) {
-            _skillButtons[i].texts.textField.text = _translate("$" + _skillButtons[i]._name.toUpperCase());
+            _skillButtons[i].texts.textField.text = "$" + _skillButtons[i]._name.toUpperCase();
         }
 
         for (var i = 0; i < _stats.length; i++) {
-            _stats[i].textField.text = _translate("$" + _stats[i]._name.toUpperCase(), true);
+            _stats[i].textField.text = toTitleCase(Translator.translate("$" + _stats[i]._name.toUpperCase()));
         }
 
-        back.texts.textField.text = _translate("$BACK");
-        proceed.texts.textField.text = _translate("$PROCEED");
+        back.texts.textField.text = "$BACK";
+        proceed.texts.textField.text = "$PROCEED";
+    }
+
+    private function setTitle(quizClass:Number) {
+        if (_mode == QUIZ) {
+            title.gotoAndStop("quiz");
+            title.textField.text = Translator.translate("$CLASS_QUIZ_TITLE") + " " + Translator.translate(_classButtons[quizClass]._name).toUpperCase();
+        } else if (_mode == LIST) {
+            title.gotoAndStop("list");
+            title.textField.text = "$CLASS_LIST_TITLE";
+        } else if (_mode == CUSTOM) {
+            title.gotoAndStop("custom");
+            title.textField.text = "$CLASS_CUSTOM_TITLE";
+        }
     }
 
     private function calculateBonuses() {
@@ -496,16 +508,12 @@ class ClassCreationMenu extends MovieClip {
     }
 
 
-    private function _translate(str:String, titleCase:Boolean):String {
-        str = Translator.translate(str);
-        if (titleCase) {
-            var arr = str.split(" ");
-            for (var i = 0; i < arr.length; i++) {
-                arr[i] = arr[i].substr(0, 1).toUpperCase() + arr[i].substr(1).toLowerCase();
-            }
-            return arr.join(" ");
+    private function toTitleCase(str:String):String {
+        var arr = str.split(" ");
+        for (var i = 0; i < arr.length; i++) {
+            arr[i] = arr[i].substr(0, 1).toUpperCase() + arr[i].substr(1).toLowerCase();
         }
-        return str;
+        return arr.join(" ");
     }
 
     private function _clone(obj:Object) {

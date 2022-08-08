@@ -92,48 +92,48 @@ Function SendClassInfo(string ClassName, string Spec, string Att1, string Att2, 
 endFunction 
 
 ;=========== method 1/method 2 shared functions ==============
-Function ConfirmClass(int class)
-	If class == 0; acrobat
+Function ConfirmClass(int classId)
+	If classId == 0; acrobat
 		SetClassToAcrobat()
-	elseIf class == 1; agent
+	elseIf classId == 1; agent
 		SetClassToAgent()
-	elseIf class == 2; archer
+	elseIf classId == 2; archer
 		SetClassToArcher()
-	elseIf class == 3; assassin
+	elseIf classId == 3; assassin
 		SetClassToAssassin()
-	elseIf class == 4; barbarian
+	elseIf classId == 4; barbarian
 		SetClassToBarbarian()
-	elseIf class == 5; bard
+	elseIf classId == 5; bard
 		SetClassToBard()
-	elseIf class == 6; battlemage
+	elseIf classId == 6; battlemage
 		SetClassToBattlemage()
-	elseIf class == 7; crusader
+	elseIf classId == 7; crusader
 		SetClassToCrusader()
-	elseIf class == 8; healer
+	elseIf classId == 8; healer
 		SetClassToHealer()
-	elseIf class == 9; knight
+	elseIf classId == 9; knight
 		SetClassToKnight()
-	elseIf class == 10; mage
+	elseIf classId == 10; mage
 		SetClassToMage()
-	elseIf class == 11; monk
+	elseIf classId == 11; monk
 		SetClassToMonk()
-	elseIf class == 12; nightblade
+	elseIf classId == 12; nightblade
 		SetClassToNightblade()
-	elseIf class == 13; pilgrim
+	elseIf classId == 13; pilgrim
 		SetClassToPilgrim()
-	elseIf class == 14; rogue
+	elseIf classId == 14; rogue
 		SetClassToRogue()
-	elseIf class == 15; scout
+	elseIf classId == 15; scout
 		SetClassToScout()
-	elseIf class == 16; sorcerer
+	elseIf classId == 16; sorcerer
 		SetClassToSorcerer()
-	elseIf class == 17; spellsword
+	elseIf classId == 17; spellsword
 		SetClassToSpellsword()
-	elseIf class == 18; thief
+	elseIf classId == 18; thief
 		SetClassToThief()
-	elseIf class == 19; warrior
+	elseIf classId == 19; warrior
 		SetClassToWarrior()
-	elseIf class == 20; witchhunter
+	elseIf classId == 20; witchhunter
 		SetClassToWitchhunter()
 	endIf
 EndFunction 
