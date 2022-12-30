@@ -15,3 +15,5 @@ RECOVER_*.fla
 *.swf
 temp.txt
 *.ipynb
+_IGNORE_*
+.vscode/
