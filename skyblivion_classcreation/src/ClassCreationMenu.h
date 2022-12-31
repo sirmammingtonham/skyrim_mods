@@ -16,7 +16,7 @@
 
 namespace Scaleform
 {
-	namespace Skywind
+	namespace Skyblivion
 	{
 		using PlayerSkill = RE::PlayerCharacter::PlayerSkills::Data::Skill;
 
@@ -173,33 +173,6 @@ namespace Scaleform
 	{
 	private:
 		static constexpr char SWF_NAME[] = "classcreationmenu";
-		enum MenuMode
-		{
-			kCustom = -2,
-			kList = -1,
-			kConfirmAcrobat = 0,
-			kConfirmAgent,
-			kConfirmArcher,
-			kConfirmAssassin,
-			kConfirmBarbarian,
-			kConfirmBard,
-			kConfirmBattlemage,
-			kConfirmCrusader,
-			kConfirmHealer,
-			kConfirmKnight,
-			kConfirmMage,
-			kConfirmMonk,
-			kConfirmNightblade,
-			kConfirmPilgrim,
-			kConfirmRogue,
-			kConfirmScout,
-			kConfirmSorcerer,
-			kConfirmSpellsword,
-			kConfirmThief,
-			kConfirmWarrior,
-			kConfirmWitchhunter,
-		};
-		static MenuMode _mode;
 
 	public:
 		using Base = RE::IMenu;
@@ -213,6 +186,15 @@ namespace Scaleform
 		virtual Result ProcessMessage(RE::UIMessage& a_message) override;
 		virtual void AdvanceMovie(float a_interval, uint32_t a_currentTime) override;
 
+		static bool ExecConsoleCommand(const RE::SCRIPT_PARAMETER* a_paramInfo,
+			RE::SCRIPT_FUNCTION::ScriptData* a_scriptData,
+			RE::TESObjectREFR* a_thisObj,
+			RE::TESObjectREFR* a_containingObj,
+			RE::Script* a_scriptObj,
+			RE::ScriptLocals* a_locals,
+			double& a_result,
+			uint32_t& a_opcodeOffsetPtr);
+
 		static void Open();
 		static void Close();
 
@@ -222,7 +204,6 @@ namespace Scaleform
 		static RE::IMenu* Create();
 		static bool RegisterFuncs(RE::BSScript::IVirtualMachine* a_vm);
 
-
 	private:
 		void OnMenuOpenMessage();
 		void OnMenuCloseMessage();
@@ -230,25 +211,22 @@ namespace Scaleform
 		static void Log(const RE::FxDelegateArgs& a_params);
 		static void OnTextFocus(const RE::FxDelegateArgs& a_params);
 		static void OnTextUnfocus(const RE::FxDelegateArgs& a_params);
-		static void OnProceedQuiz(const RE::FxDelegateArgs& a_params);
 		static void OnProceedList(const RE::FxDelegateArgs& a_params);
 		static void OnProceedCustom(const RE::FxDelegateArgs& a_params);
-		static void OnBack(const RE::FxDelegateArgs& a_params);
 		static void CloseMenu(const RE::FxDelegateArgs& a_params);
 
 		void InitExtensions();
-		void OnProceedQuiz();
-		void OnProceedList(Skywind::Class a_class);
-		void OnProceedCustom(Skywind::CustomClassData a_data);
-		void OnBack();
-		void SetMode();
+		void OnProceedList(Skyblivion::Class a_class);
+		void OnProceedCustom(Skyblivion::CustomClassData a_data);
 		void SetInfo();
 
 		// papyrus register helpers
-		static void OpenMenuPapyrus(RE::StaticFunctionTag*, int32_t mode);
-		// static void CloseMenuPapyrus(RE::StaticFunctionTag*); //cant imaging a situation where you need to close programmatically
+		static void OpenMenuPapyrus(RE::StaticFunctionTag*);
+		// static void CloseMenuPapyrus(RE::StaticFunctionTag*); //cant imagine a situation where you need to close programmatically
 
 		void SanitizeString(std::string& a_str);
+
+		static constexpr char COMMAND_NAME[] = "OpenClassMenu";
 	};
 
 	constexpr std::string_view ClassCreationMenu::Name()

@@ -8,8 +8,6 @@
 
 namespace Scaleform
 {
-	ClassCreationMenu::MenuMode ClassCreationMenu::_mode = MenuMode::kCustom;
-
 	ClassCreationMenu::ClassCreationMenu()
 	{
 		using Context = RE::UserEvents::INPUT_CONTEXT_ID;
@@ -44,13 +42,26 @@ namespace Scaleform
 		uiMovie->SetVisible(false);
 	}
 
+	bool ClassCreationMenu::ExecConsoleCommand([[maybe_unused]] const RE::SCRIPT_PARAMETER* a_paramInfo,
+		[[maybe_unused]] RE::SCRIPT_FUNCTION::ScriptData* a_scriptData,
+		[[maybe_unused]] RE::TESObjectREFR* a_thisObj,
+		[[maybe_unused]] RE::TESObjectREFR* a_containingObj,
+		[[maybe_unused]] RE::Script* a_scriptObj,
+		[[maybe_unused]] RE::ScriptLocals* a_locals,
+		[[maybe_unused]] double& a_result,
+		[[maybe_unused]] uint32_t& a_opcodeOffsetPtr)
+	{
+		logger::info("did a thing");
+		auto task = SKSE::GetTaskInterface();
+		task->AddUITask(Open);
+		return true;
+	}
+
 	void ClassCreationMenu::Accept(RE::FxDelegateHandler::CallbackProcessor* a_processor)
 	{
 		a_processor->Process("Log", Log);
-		a_processor->Process("OnProceedQuiz", OnProceedQuiz);
 		a_processor->Process("OnProceedList", OnProceedList);
 		a_processor->Process("OnProceedCustom", OnProceedCustom);
-		a_processor->Process("OnBack", OnBack);
 	}
 
 	auto ClassCreationMenu::ProcessMessage(RE::UIMessage& a_message)
@@ -78,7 +89,6 @@ namespace Scaleform
 
 		uiMovie->SetVisible(true);
 
-		SetMode();
 		SetInfo();
 	}
 
@@ -112,8 +122,19 @@ namespace Scaleform
 	{
 		auto ui = RE::UI::GetSingleton();
 		ui->Register(Name(), Create);
-
 		logger::info("Registered {} (pls work)", Name().data());
+
+		auto info = RE::SCRIPT_FUNCTION::LocateConsoleCommand("DumpNiUpdates");  // unused
+		if (info) {
+			info->functionName = COMMAND_NAME;
+			info->params = 0;
+			info->numParams = 0;
+			info->executeFunction = &ExecConsoleCommand;
+
+			logger::info("Registered console command: {}", COMMAND_NAME);
+		} else {
+			logger::error("Failed to register console command: {}!", COMMAND_NAME);
+		}
 	}
 
 	RE::IMenu* ClassCreationMenu::Create()
@@ -133,18 +154,11 @@ namespace Scaleform
 		logger::info("{} swf: {}", Name().data(), a_params[0].GetString());
 	}
 
-	void ClassCreationMenu::OnProceedQuiz([[maybe_unused]] const RE::FxDelegateArgs& a_params)
-	{
-		assert(a_params.GetArgCount() == 0);
-		auto menu = static_cast<ClassCreationMenu*>(a_params.GetHandler());
-		menu->OnProceedQuiz();
-	}
-
 	void ClassCreationMenu::OnProceedList([[maybe_unused]] const RE::FxDelegateArgs& a_params)
 	{
 		assert(a_params.GetArgCount() == 1);
 		auto menu = static_cast<ClassCreationMenu*>(a_params.GetHandler());
-		menu->OnProceedList(static_cast<Skywind::Class>(a_params[0].GetNumber()));
+		menu->OnProceedList(static_cast<Skyblivion::Class>(a_params[0].GetNumber()));
 	}
 
 	void ClassCreationMenu::OnProceedCustom([[maybe_unused]] const RE::FxDelegateArgs& a_params)
@@ -152,32 +166,24 @@ namespace Scaleform
 		assert(a_params.GetArgCount() == 14);
 		auto menu = static_cast<ClassCreationMenu*>(a_params.GetHandler());
 		menu->OnProceedCustom(
-			Skywind::CustomClassData{
+			Skyblivion::CustomClassData{
 				std::make_pair(
-					static_cast<Skywind::Attribute>(a_params[0].GetNumber()),
-					static_cast<Skywind::Attribute>(a_params[1].GetNumber())),
-				static_cast<Skywind::Specialization>(a_params[2].GetNumber()),
+					static_cast<Skyblivion::Attribute>(a_params[0].GetNumber()),
+					static_cast<Skyblivion::Attribute>(a_params[1].GetNumber())),
+				static_cast<Skyblivion::Specialization>(a_params[2].GetNumber()),
 				{
-					static_cast<Skywind::Skill>(a_params[3].GetNumber()),
-					static_cast<Skywind::Skill>(a_params[4].GetNumber()),
-					static_cast<Skywind::Skill>(a_params[5].GetNumber()),
-					static_cast<Skywind::Skill>(a_params[6].GetNumber()),
-					static_cast<Skywind::Skill>(a_params[7].GetNumber()),
-					static_cast<Skywind::Skill>(a_params[8].GetNumber()),
-					static_cast<Skywind::Skill>(a_params[9].GetNumber()),
-					static_cast<Skywind::Skill>(a_params[10].GetNumber()),
-					static_cast<Skywind::Skill>(a_params[11].GetNumber()),
+					static_cast<Skyblivion::Skill>(a_params[3].GetNumber()),
+					static_cast<Skyblivion::Skill>(a_params[4].GetNumber()),
+					static_cast<Skyblivion::Skill>(a_params[5].GetNumber()),
+					static_cast<Skyblivion::Skill>(a_params[6].GetNumber()),
+					static_cast<Skyblivion::Skill>(a_params[7].GetNumber()),
+					static_cast<Skyblivion::Skill>(a_params[8].GetNumber()),
+					static_cast<Skyblivion::Skill>(a_params[9].GetNumber()),
+					static_cast<Skyblivion::Skill>(a_params[10].GetNumber()),
+					static_cast<Skyblivion::Skill>(a_params[11].GetNumber()),
 				},
 				std::string_view(a_params[12].GetString()),
-				std::string_view(a_params[13].GetString())
-				 });
-	}
-
-	void ClassCreationMenu::OnBack([[maybe_unused]] const RE::FxDelegateArgs& a_params)
-	{
-		assert(a_params.GetArgCount() == 0);
-		auto menu = static_cast<ClassCreationMenu*>(a_params.GetHandler());
-		menu->OnBack();
+				std::string_view(a_params[13].GetString()) });
 	}
 
 	void ClassCreationMenu::InitExtensions()
@@ -191,12 +197,7 @@ namespace Scaleform
 		assert(success);
 	}
 
-	void ClassCreationMenu::OnProceedQuiz()
-	{
-		Close();
-	}
-
-	void ClassCreationMenu::OnProceedList(Skywind::Class a_class)
+	void ClassCreationMenu::OnProceedList(Skyblivion::Class a_class)
 	{
 		auto vm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
 		auto args = RE::MakeFunctionArguments(static_cast<int32_t>(a_class));
@@ -210,7 +211,7 @@ namespace Scaleform
 		Close();
 	}
 
-	void ClassCreationMenu::OnProceedCustom(Skywind::CustomClassData a_data)
+	void ClassCreationMenu::OnProceedCustom(Skyblivion::CustomClassData a_data)
 	{
 		auto vm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
 		auto args = RE::MakeFunctionArguments(
@@ -238,32 +239,10 @@ namespace Scaleform
 		Close();
 	}
 
-	void ClassCreationMenu::OnBack()
-	{
-		Close();
-	}
-
-	void ClassCreationMenu::SetMode()
-	{
-		// interface
-		if (_mode == MenuMode::kCustom) {
-			RE::ControlMap* map = RE::ControlMap::GetSingleton();
-			map->AllowTextInput(true);
-		}
-
-		RE::FxResponseArgs<1> response;
-		RE::GFxValue mode;
-		mode.SetNumber(static_cast<double>(_mode));
-		response.Add(mode);
-		RE::FxDelegate::Invoke(uiMovie.get(), "SetMode", response);
-
-		logger::info("opening class menu in mode {}", _mode);
-	}
-
 	void ClassCreationMenu::SetInfo()
 	{
 		using AV = RE::ActorValue;
-		using SkyAV = Skywind::ActorValue;
+		using SkyAV = Skyblivion::ActorValue;
 
 		auto player = RE::PlayerCharacter::GetSingleton();
 
@@ -293,32 +272,26 @@ namespace Scaleform
 		attributes.SetMember("personality", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kPersonality)));
 		attributes.SetMember("luck", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kLuck)));
 
-		skills.SetMember("athletics", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kAxe)));
-		skills.SetMember("axe", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kBlock)));
-		skills.SetMember("block", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kBlunt)));
-		skills.SetMember("blunt_weapon", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kHeavyArmor)));
-		skills.SetMember("heavy_armor", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kLongBlade)));
-		skills.SetMember("long_blade", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kMediumArmor)));
-		skills.SetMember("medium_armor", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kPolearm)));
-		skills.SetMember("polearms", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kSmithing)));
-		skills.SetMember("smithing", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kAthletics)));
+		skills.SetMember("acrobatics", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kAcrobatics)));
+		skills.SetMember("athletics", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kAthletics)));
+		skills.SetMember("block", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kBlock)));
+		skills.SetMember("blunt", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kBlunt)));
+		skills.SetMember("heavy_armor", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kHeavyArmor)));
+		skills.SetMember("smithing", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kSmithing)));
 		skills.SetMember("alchemy", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kAlchemy)));
 		skills.SetMember("alteration", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kAlteration)));
 		skills.SetMember("conjuration", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kConjuration)));
 		skills.SetMember("destruction", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kDestruction)));
-		skills.SetMember("enchant", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kEnchanting)));
 		skills.SetMember("illusion", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kIllusion)));
 		skills.SetMember("mysticism", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kMysticism)));
 		skills.SetMember("restoration", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kRestoration)));
-		skills.SetMember("unarmored", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kUnarmorerd)));
-		skills.SetMember("acrobatics", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kHandToHand)));
-		skills.SetMember("hand_to_hand", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kLightArmor)));
-		skills.SetMember("light_armor", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kMarksman)));
-		skills.SetMember("marksman", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kSecurity)));
-		skills.SetMember("mercantile", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kShortBlade)));
-		skills.SetMember("security", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kSneak)));
-		skills.SetMember("short_blade", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kMercantile)));
-		skills.SetMember("sneak", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kAcrobatics)));
+		skills.SetMember("acrobatics", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kAcrobatics)));
+		skills.SetMember("hand_to_hand", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kHandToHand)));
+		skills.SetMember("light_armor", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kLightArmor)));
+		skills.SetMember("marksman", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kMarksman)));
+		skills.SetMember("mercantile", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kMercantile)));
+		skills.SetMember("security", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kSecurity)));
+		skills.SetMember("sneak", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kSneak)));
 		skills.SetMember("speechcraft", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kSpeechcraft)));
 
 		response.Add(playerStats);
@@ -338,17 +311,15 @@ namespace Scaleform
 		}
 	}
 
-	void ClassCreationMenu::OpenMenuPapyrus(RE::StaticFunctionTag*, int32_t mode)
+	void ClassCreationMenu::OpenMenuPapyrus(RE::StaticFunctionTag*)
 	{
-		assert(mode >= 0 && mode <= 2);
-		_mode = static_cast<MenuMode>(mode);
 		auto task = SKSE::GetTaskInterface();
 		task->AddUITask(Open);
 	}
 
 	bool ClassCreationMenu::RegisterFuncs(RE::BSScript::IVirtualMachine* a_vm)
 	{
-		a_vm->RegisterFunction("OpenClassMenu", "Skywind", OpenMenuPapyrus);
+		a_vm->RegisterFunction("OpenClassMenu", "Skyblivion", OpenMenuPapyrus);
 		return true;
 	}
 }

@@ -12,13 +12,11 @@ import gfx.events.EventDispatcher;
 import gfx.events.EventTypes;
 
 // last todo:
-// add remaining art once finished
 // writing for classes and skills
 
 class ClassCreationMenu extends MovieClip {
-    public static var QUIZ = 0;
-    public static var LIST = 1;
-    public static var CUSTOM = 2;
+    public static var SELECT = 0;
+    public static var CREATE = 1;
 
     // class
     private var acrobat:ClassCreationButton;
@@ -60,32 +58,26 @@ class ClassCreationMenu extends MovieClip {
 
     // warrior skills
     private var athletics:ClassCreationButton;
-    private var axe:ClassCreationButton;
+    private var blade:ClassCreationButton;
     private var block:ClassCreationButton;
-    private var blunt_weapon:ClassCreationButton;
+    private var blunt:ClassCreationButton;
+    private var hand_to_hand:ClassCreationButton;
     private var heavy_armor:ClassCreationButton;
-    private var long_blade:ClassCreationButton;
-    private var medium_armor:ClassCreationButton;
-    private var polearms:ClassCreationButton;
     private var smithing:ClassCreationButton;
     // mage skills
     private var alchemy:ClassCreationButton;
     private var alteration:ClassCreationButton;
     private var conjuration:ClassCreationButton;
     private var destruction:ClassCreationButton;
-    private var enchant:ClassCreationButton;
     private var illusion:ClassCreationButton;
     private var mysticism:ClassCreationButton;
     private var restoration:ClassCreationButton;
-    private var unarmored:ClassCreationButton;
     // thief skills
     private var acrobatics:ClassCreationButton;
-    private var hand_to_hand:ClassCreationButton;
     private var light_armor:ClassCreationButton;
     private var marksman:ClassCreationButton;
     private var mercantile:ClassCreationButton;
     private var security:ClassCreationButton;
-    private var short_blade:ClassCreationButton;
     private var sneak:ClassCreationButton;
     private var speechcraft:ClassCreationButton;
 
@@ -99,24 +91,27 @@ class ClassCreationMenu extends MovieClip {
     private var carry_weight:MovieClip;
 
     // other stuff
-    private var title:MovieClip;
-    private var attributes_si:MovieClip;
-    private var skills_si:MovieClip;
+    private var select_class:ClassCreationButton;
+    private var create_class:ClassCreationButton;
 
-    private var proceed:ClassCreationButton;
-    private var back:ClassCreationButton;
+    private var attribute_indicator:MovieClip;
+    private var skill_indicator:MovieClip;
+
+    private var confirm:ClassCreationButton;
 
     private var class_art:MovieClip;
     private var class_description:ClassCreationTextInput;
-    private var custom:ClassCreationTextInput;
 
     private var skill_art:MovieClip;
     private var skill_description:TextField;
 
+    private var custom_class_header:TextField;
+    private var custom_class_name:ClassCreationTextInput;
+
     private var _state:Object = new Object();
 
     /////
-    private var _mode:Number = 2;
+    private var _mode:Number = 0;
     private var _numAttributes:Number = 0;
     private var _numSkills:Number = 0;
     private var _classButtons:Array;
@@ -161,30 +156,24 @@ class ClassCreationMenu extends MovieClip {
             strength,
             willpower];
         _skillButtons = [athletics,
-            axe,
+            blade,
             block,
-            blunt_weapon,
+            blunt,
+            hand_to_hand,
             heavy_armor,
-            long_blade,
-            medium_armor,
-            polearms,
             smithing,
             alchemy,
             alteration,
             conjuration,
             destruction,
-            enchant,
             illusion,
             mysticism,
             restoration,
-            unarmored,
             acrobatics,
-            hand_to_hand,
             light_armor,
             marksman,
             mercantile,
             security,
-            short_blade,
             sneak,
             speechcraft];
         _stats = [health,
@@ -199,11 +188,6 @@ class ClassCreationMenu extends MovieClip {
     public function onLoad():Void {
         super.onLoad();
         GameDelegate.addCallBack("SetInfo", this, "SetInfo");
-        GameDelegate.addCallBack("SetMode", this, "SetMode");
-
-        // SetMode(QUIZ);
-        // SetMode(-1);
-        // SetMode(-2);
 
         this.setButtonText();
 
@@ -227,10 +211,16 @@ class ClassCreationMenu extends MovieClip {
         }
 
         ///
-        proceed.addEventListener(EventTypes.CLICK, this, "handleProceedPress");
-        back.addEventListener(EventTypes.CLICK, this, "handleBackPress");
+        select_class.addEventListener(EventTypes.CLICK, this, "handleSelectClassPress");
+        create_class.addEventListener(EventTypes.CLICK, this, "handleCreateClassPress");
+        confirm.addEventListener(EventTypes.CLICK, this, "handleConfirmPress");
 
-        proceed.disabled = true;
+        select_class.texts.textField.text = "$Select Class";
+        create_class.texts.textField.text = "$Create Class";
+
+        handleSelectClassPress();
+
+        confirm.disabled = true;
     }
 
     public function InitExtensions():Void {
@@ -241,45 +231,61 @@ class ClassCreationMenu extends MovieClip {
         return true;
     }
 
-    public function SetMode(x:Number) {
-        if (x == -2) {
-            _mode = CUSTOM;
-        } else if (x == -1) {
-            _mode = LIST;
-            acrobat.selected = true; // default value
-        } else {
-            _mode = QUIZ;
-            _classButtons[x].selected = true;
-        }
-        setTitle(x);
+    private function handleSelectClassPress(a_event:Object) {
+        _mode = SELECT;
+        monk.selected = true; // select random class so we can reset if after create class (hacky but fuck you)
+        acrobat.selected = true; // default
 
         for (var i = 0; i < _classButtons.length; i++) {
-            _classButtons[i].disabled = (_mode != LIST);
+            _classButtons[i].disabled = false;
+            _classButtons[i]._alpha = 100;
         }
         for (var i = 0; i < _specButtons.length; i++) {
-            _specButtons[i].disabled = (_mode != CUSTOM);
+            _specButtons[i].disabled = true;
         }
         for (var i = 0; i < _attrButtons.length; i++) {
-            _attrButtons[i].disabled = (_mode != CUSTOM);
+            _attrButtons[i].disabled = true;
         }
         for (var i = 0; i < _skillButtons.length; i++) {
-            _skillButtons[i].disabled = (_mode != CUSTOM);
+            _skillButtons[i].disabled = true;
         }
 
-        // allow text editing and set class button visibility
-        if (_mode == CUSTOM) {
-            for (var i = 0; i < _classButtons.length; i++) {
-                _classButtons[i]._alpha = 0.0;
-            }
-            class_art.gotoAndStop("custom");
-        } else {
-            class_description.disabled = true;
-            custom.swapDepths(acrobat);
-            custom.disabled = true;
-            custom._alpha = 0.0;
-            attributes_si._alpha = 70;
-            skills_si._alpha = 70;
+        custom_class_name.swapDepths(mage);
+        class_description.disabled = true;
+        custom_class_name.disabled = true;
+        custom_class_header._alpha = 0.0;
+        custom_class_name._alpha = 0.0;
+        attribute_indicator._alpha = 70;
+        skill_indicator._alpha = 70;
+    }
+
+    private function handleCreateClassPress(a_event:Object) {
+        _mode = CREATE;
+        unselectAll();
+        combat.selected = true;
+        
+        for (var i = 0; i < _classButtons.length; i++) {
+            _classButtons[i].disabled = true;
+            _classButtons[i]._alpha = 0.0;
         }
+        for (var i = 0; i < _specButtons.length; i++) {
+            _specButtons[i].disabled = false;
+        }
+        for (var i = 0; i < _attrButtons.length; i++) {
+            _attrButtons[i].disabled = false;
+        }
+        for (var i = 0; i < _skillButtons.length; i++) {
+            _skillButtons[i].disabled = false;
+        }
+        class_art.gotoAndStop("custom");
+
+        custom_class_name.swapDepths(mage);
+        class_description.disabled = false;
+        custom_class_name.disabled = false;
+        custom_class_header._alpha = 100;
+        custom_class_name._alpha = 100;
+        attribute_indicator._alpha = 100;
+        skill_indicator._alpha = 100;
     }
 
     private function SetInfo(statsArg:Object, attrArg:Object, skillArg:Object) {
@@ -300,22 +306,17 @@ class ClassCreationMenu extends MovieClip {
         calculateBonuses();
     }
 
-    private function handleProceedPress(a_event:Object) {
-        if (_mode == QUIZ) {
-            GameDelegate.call("OnProceedQuiz", []);
-            return;
-        }
-
-        if (_mode == LIST) {
+    private function handleConfirmPress(a_event:Object) {
+        if (_mode == SELECT) {
             for (var i = 0; i < _classButtons.length; i++) {
                 if (_classButtons[i].selected) {
-                    GameDelegate.call("OnProceedList", [i]);
+                    GameDelegate.call("OnConfirmList", [i]);
                     return;
                 }
             }
         }
 
-        if (_mode == CUSTOM) {
+        if (_mode == CREATE) {
             var args:Array = [];
             for (var i = 0; i < _attrButtons.length; i++) {
                 if (_attrButtons[i].selected) {
@@ -332,16 +333,12 @@ class ClassCreationMenu extends MovieClip {
                     args.push(i);
                 }
             }
-            args.push(custom.textOrDefault)
+            args.push(custom_class_name.textOrDefault)
             args.push(class_description.textOrDefault)
 
-            GameDelegate.call("OnProceedCustom", args);
+            GameDelegate.call("OnConfirmCustom", args);
             return;
         }
-    }
-
-    private function handleBackPress(a_event:Object) {
-        GameDelegate.call("OnBack", []);
     }
 
     private function handleClassPress(a_event:Object) {
@@ -359,7 +356,7 @@ class ClassCreationMenu extends MovieClip {
     private function handleAttributePress(a_event:Object) {
         if (a_event.target.selected) {
             _numAttributes += 1;
-            if (_mode == CUSTOM && _numAttributes == 2) {
+            if (_mode == CREATE && _numAttributes == 2) {
                 for (var i = 0; i < _attrButtons.length; i++) {
                     var button = _attrButtons[i];
                     if (!button.selected) {
@@ -369,21 +366,21 @@ class ClassCreationMenu extends MovieClip {
             }
         } else {
             _numAttributes -= 1;
-            if (_mode == CUSTOM && _numAttributes == 1) {
+            if (_mode == CREATE && _numAttributes == 1) {
                 for (var i = 0; i < _attrButtons.length; i++) {
                     _attrButtons[i].disabled = false;
                 }
             }
         }
 
-        attributes_si.gotoAndStop(_numAttributes + 1);
+        attribute_indicator.gotoAndStop(_numAttributes + 1);
         calculateBonuses();
     }
 
     private function handleSkillPress(a_event:Object) {
         if (a_event.target.selected) {
             _numSkills += 1;
-            if (_mode == CUSTOM && _numSkills == 9) {
+            if (_mode == CREATE && _numSkills == 7) {
                 for (var i = 0; i < _skillButtons.length; i++) {
                     var button = _skillButtons[i];
                     if (!button.selected) {
@@ -393,14 +390,14 @@ class ClassCreationMenu extends MovieClip {
             }
         } else {
             _numSkills -= 1;
-            if (_mode == CUSTOM && _numSkills == 8) {
+            if (_mode == CREATE && _numSkills == 6) {
                 for (var i = 0; i < _skillButtons.length; i++) {
                     _skillButtons[i].disabled = false;
                 }
             }
         }
 
-        skills_si.gotoAndStop(_numSkills + 1);
+        skill_indicator.gotoAndStop(_numSkills + 1);
         calculateBonuses();
     }
 
@@ -433,39 +430,23 @@ class ClassCreationMenu extends MovieClip {
         for (var i = 0; i < _stats.length; i++) {
             _stats[i].textField.text = toTitleCase(Translator.translate("$" + _stats[i]._name.toUpperCase()));
         }
-
-        back.texts.textField.text = "$BACK";
-        proceed.texts.textField.text = "$PROCEED";
-    }
-
-    private function setTitle(quizClass:Number) {
-        if (_mode == QUIZ) {
-            title.gotoAndStop("quiz");
-            title.textField.text = Translator.translate("$CLASS_QUIZ_TITLE") + " " + Translator.translate(_classButtons[quizClass]._name).toUpperCase();
-        } else if (_mode == LIST) {
-            title.gotoAndStop("list");
-            title.textField.text = "$CLASS_LIST_TITLE";
-        } else if (_mode == CUSTOM) {
-            title.gotoAndStop("custom");
-            title.textField.text = "$CLASS_CUSTOM_TITLE";
-        }
     }
 
     private function calculateBonuses() {
         var state_copy = _clone(_state);
-        var proceed_counter = 0;
+        var confirm_counter = 0;
 
         // add selected buttons
         for (var i in _attrButtons) {
             if (_attrButtons[i].selected) {
                 state_copy[_attrButtons[i]._name] += 10;
-                proceed_counter++;
+                confirm_counter++;
             }
         }
         for (var i in _skillButtons) {
             if (_skillButtons[i].selected) {
                 state_copy[_skillButtons[i]._name] += 10;
-                proceed_counter++;
+                confirm_counter++;
             }
         }
 
@@ -474,21 +455,21 @@ class ClassCreationMenu extends MovieClip {
             for (var i = 0; i < 9; i++) {
                 state_copy[_skillButtons[i]._name] += 5;
             }
-            proceed_counter++;
+            confirm_counter++;
         } else if (magic.selected) {
             for (var i = 9; i < 18; i++) {
                 state_copy[_skillButtons[i]._name] += 5;
             }
-            proceed_counter++;
+            confirm_counter++;
         } else if (stealth.selected) {
             for (var i = 18; i < 27; i++) {
                 state_copy[_skillButtons[i]._name] += 5;
             }
-            proceed_counter++;
+            confirm_counter++;
         }
 
         // update values on menu
-        proceed.disabled = (proceed_counter != 12);
+        confirm.disabled = (confirm_counter != 9);
         for (var name in state_copy) {
             this[name].value = state_copy[name];
         }

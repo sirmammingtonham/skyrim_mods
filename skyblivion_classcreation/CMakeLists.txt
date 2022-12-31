@@ -111,8 +111,8 @@ if("${COPY_OUTPUT}")
 	add_custom_command(
 		TARGET "${SUBPROJ_NAME}"
 		POST_BUILD
-		COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:${SUBPROJ_NAME}>" "E:/Skyrim/Skyrim (SE)/mods/Skywind Work/SKSE/Plugins/"
-		COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_PDB_FILE:${SUBPROJ_NAME}>" "E:/Skyrim/Skyrim (SE)/mods/Skywind Work/SKSE/Plugins/"
+		COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:${SUBPROJ_NAME}>" "E:/Skyrim/Skyrim (SE)/mods/Skyblivion Work/SKSE/Plugins/"
+		COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_PDB_FILE:${SUBPROJ_NAME}>" "E:/Skyrim/Skyrim (SE)/mods/Skyblivion Work/SKSE/Plugins/"
 		VERBATIM
 	)
 endif()

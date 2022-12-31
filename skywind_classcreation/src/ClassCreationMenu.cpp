@@ -293,15 +293,15 @@ namespace Scaleform
 		attributes.SetMember("personality", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kPersonality)));
 		attributes.SetMember("luck", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kLuck)));
 
-		skills.SetMember("athletics", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kAxe)));
-		skills.SetMember("axe", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kBlock)));
-		skills.SetMember("block", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kBlunt)));
-		skills.SetMember("blunt_weapon", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kHeavyArmor)));
-		skills.SetMember("heavy_armor", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kLongBlade)));
-		skills.SetMember("long_blade", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kMediumArmor)));
-		skills.SetMember("medium_armor", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kPolearm)));
-		skills.SetMember("polearms", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kSmithing)));
-		skills.SetMember("smithing", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kAthletics)));
+		skills.SetMember("athletics", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kAthletics)));
+		skills.SetMember("axe", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kAxe)));
+		skills.SetMember("block", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kBlock)));
+		skills.SetMember("blunt_weapon", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kBlunt)));
+		skills.SetMember("heavy_armor", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kHeavyArmor)));
+		skills.SetMember("long_blade", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kLongBlade)));
+		skills.SetMember("medium_armor", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kMediumArmor)));
+		skills.SetMember("polearms", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kPolearm)));
+		skills.SetMember("smithing", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kSmithing)));
 		skills.SetMember("alchemy", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kAlchemy)));
 		skills.SetMember("alteration", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kAlteration)));
 		skills.SetMember("conjuration", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kConjuration)));
@@ -311,14 +311,14 @@ namespace Scaleform
 		skills.SetMember("mysticism", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kMysticism)));
 		skills.SetMember("restoration", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kRestoration)));
 		skills.SetMember("unarmored", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kUnarmorerd)));
-		skills.SetMember("acrobatics", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kHandToHand)));
-		skills.SetMember("hand_to_hand", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kLightArmor)));
-		skills.SetMember("light_armor", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kMarksman)));
-		skills.SetMember("marksman", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kSecurity)));
-		skills.SetMember("mercantile", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kShortBlade)));
-		skills.SetMember("security", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kSneak)));
-		skills.SetMember("short_blade", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kMercantile)));
-		skills.SetMember("sneak", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kAcrobatics)));
+		skills.SetMember("acrobatics", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kAcrobatics)));
+		skills.SetMember("hand_to_hand", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kHandToHand)));
+		skills.SetMember("light_armor", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kLightArmor)));
+		skills.SetMember("marksman", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kMarksman)));
+		skills.SetMember("mercantile", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kMercantile)));
+		skills.SetMember("security", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kSecurity)));
+		skills.SetMember("short_blade", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kShortBlade)));
+		skills.SetMember("sneak", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kSneak)));
 		skills.SetMember("speechcraft", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kSpeechcraft)));
 
 		response.Add(playerStats);
