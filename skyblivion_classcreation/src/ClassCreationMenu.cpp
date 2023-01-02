@@ -60,8 +60,7 @@ namespace Scaleform
 	void ClassCreationMenu::Accept(RE::FxDelegateHandler::CallbackProcessor* a_processor)
 	{
 		a_processor->Process("Log", Log);
-		a_processor->Process("OnProceedList", OnProceedList);
-		a_processor->Process("OnProceedCustom", OnProceedCustom);
+		a_processor->Process("OnConfirm", OnConfirm);
 	}
 
 	auto ClassCreationMenu::ProcessMessage(RE::UIMessage& a_message)
@@ -86,6 +85,9 @@ namespace Scaleform
 		// set blur
 		auto bm = RE::UIBlurManager::GetSingleton();
 		bm->IncrementBlurCount();
+
+		RE::ControlMap* map = RE::ControlMap::GetSingleton();
+		map->AllowTextInput(true);
 
 		uiMovie->SetVisible(true);
 
@@ -154,36 +156,25 @@ namespace Scaleform
 		logger::info("{} swf: {}", Name().data(), a_params[0].GetString());
 	}
 
-	void ClassCreationMenu::OnProceedList([[maybe_unused]] const RE::FxDelegateArgs& a_params)
+	void ClassCreationMenu::OnConfirm([[maybe_unused]] const RE::FxDelegateArgs& a_params)
 	{
-		assert(a_params.GetArgCount() == 1);
+		assert(a_params.GetArgCount() == 12);
 		auto menu = static_cast<ClassCreationMenu*>(a_params.GetHandler());
-		menu->OnProceedList(static_cast<Skyblivion::Class>(a_params[0].GetNumber()));
-	}
-
-	void ClassCreationMenu::OnProceedCustom([[maybe_unused]] const RE::FxDelegateArgs& a_params)
-	{
-		assert(a_params.GetArgCount() == 14);
-		auto menu = static_cast<ClassCreationMenu*>(a_params.GetHandler());
-		menu->OnProceedCustom(
+		menu->OnConfirm(
 			Skyblivion::CustomClassData{
 				std::make_pair(
 					static_cast<Skyblivion::Attribute>(a_params[0].GetNumber()),
 					static_cast<Skyblivion::Attribute>(a_params[1].GetNumber())),
 				static_cast<Skyblivion::Specialization>(a_params[2].GetNumber()),
-				{
-					static_cast<Skyblivion::Skill>(a_params[3].GetNumber()),
+				{ static_cast<Skyblivion::Skill>(a_params[3].GetNumber()),
 					static_cast<Skyblivion::Skill>(a_params[4].GetNumber()),
 					static_cast<Skyblivion::Skill>(a_params[5].GetNumber()),
 					static_cast<Skyblivion::Skill>(a_params[6].GetNumber()),
 					static_cast<Skyblivion::Skill>(a_params[7].GetNumber()),
 					static_cast<Skyblivion::Skill>(a_params[8].GetNumber()),
-					static_cast<Skyblivion::Skill>(a_params[9].GetNumber()),
-					static_cast<Skyblivion::Skill>(a_params[10].GetNumber()),
-					static_cast<Skyblivion::Skill>(a_params[11].GetNumber()),
-				},
-				std::string_view(a_params[12].GetString()),
-				std::string_view(a_params[13].GetString()) });
+					static_cast<Skyblivion::Skill>(a_params[9].GetNumber()) },
+				std::string_view(a_params[10].GetString()),
+				std::string_view(a_params[11].GetString()) });
 	}
 
 	void ClassCreationMenu::InitExtensions()
@@ -197,44 +188,28 @@ namespace Scaleform
 		assert(success);
 	}
 
-	void ClassCreationMenu::OnProceedList(Skyblivion::Class a_class)
+	void ClassCreationMenu::OnConfirm([[maybe_unused]] Skyblivion::CustomClassData a_data)
 	{
-		auto vm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
-		auto args = RE::MakeFunctionArguments(static_cast<int32_t>(a_class));
-		auto form = RE::TESForm::LookupByEditorID("fbmwChargen");
+		// auto vm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
+		// auto args = RE::MakeFunctionArguments(
+		// 	RE::BSFixedString(a_data.name),
+		// 	RE::BSFixedString(a_data.description),
+		// 	static_cast<int32_t>(a_data.attributes.first),
+		// 	static_cast<int32_t>(a_data.attributes.second),
+		// 	static_cast<int32_t>(a_data.specialization),
+		// 	static_cast<int32_t>(a_data.skills.at(0)),
+		// 	static_cast<int32_t>(a_data.skills.at(1)),
+		// 	static_cast<int32_t>(a_data.skills.at(2)),
+		// 	static_cast<int32_t>(a_data.skills.at(3)),
+		// 	static_cast<int32_t>(a_data.skills.at(4)),
+		// 	static_cast<int32_t>(a_data.skills.at(5)),
+		// 	static_cast<int32_t>(a_data.skills.at(6)));
 
-		auto handle = vm->GetObjectHandlePolicy()->GetHandleForObject(RE::FormType::Quest, form);
+		// auto form = RE::TESForm::LookupByEditorID("TES4Chargen");
+		// auto handle = vm->GetObjectHandlePolicy()->GetHandleForObject(RE::FormType::Quest, form);
 
-		RE::BSTSmartPointer<RE::BSScript::IStackCallbackFunctor> callback;
-		vm->DispatchMethodCall(handle, "fbmw_chargenclasspicklistscript", "ConfirmClass", args, callback);
-
-		Close();
-	}
-
-	void ClassCreationMenu::OnProceedCustom(Skyblivion::CustomClassData a_data)
-	{
-		auto vm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
-		auto args = RE::MakeFunctionArguments(
-			RE::BSFixedString(a_data.name),
-			RE::BSFixedString(a_data.description),
-			static_cast<int32_t>(a_data.attributes.first),
-			static_cast<int32_t>(a_data.attributes.second),
-			static_cast<int32_t>(a_data.specialization),
-			static_cast<int32_t>(a_data.skills.at(0)),
-			static_cast<int32_t>(a_data.skills.at(1)),
-			static_cast<int32_t>(a_data.skills.at(2)),
-			static_cast<int32_t>(a_data.skills.at(3)),
-			static_cast<int32_t>(a_data.skills.at(4)),
-			static_cast<int32_t>(a_data.skills.at(5)),
-			static_cast<int32_t>(a_data.skills.at(6)),
-			static_cast<int32_t>(a_data.skills.at(7)),
-			static_cast<int32_t>(a_data.skills.at(8)));
-
-		auto form = RE::TESForm::LookupByEditorID("fbmwChargen");
-		auto handle = vm->GetObjectHandlePolicy()->GetHandleForObject(RE::FormType::Quest, form);
-
-		RE::BSTSmartPointer<RE::BSScript::IStackCallbackFunctor> callback;
-		vm->DispatchMethodCall(handle, "fbmw_chargenclasscustomscript", "ConfirmClass", args, callback);
+		// RE::BSTSmartPointer<RE::BSScript::IStackCallbackFunctor> callback;
+		// vm->DispatchMethodCall(handle, "TES4ChargenScript", "ConfirmClass", args, callback);
 
 		Close();
 	}
@@ -272,12 +247,13 @@ namespace Scaleform
 		attributes.SetMember("personality", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kPersonality)));
 		attributes.SetMember("luck", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kLuck)));
 
-		skills.SetMember("acrobatics", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kAcrobatics)));
+		skills.SetMember("armorer", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kArmorer)));
 		skills.SetMember("athletics", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kAthletics)));
+		skills.SetMember("blade", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kBlade)));
 		skills.SetMember("block", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kBlock)));
 		skills.SetMember("blunt", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kBlunt)));
+		skills.SetMember("hand_to_hand", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kHandToHand)));
 		skills.SetMember("heavy_armor", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kHeavyArmor)));
-		skills.SetMember("smithing", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kSmithing)));
 		skills.SetMember("alchemy", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kAlchemy)));
 		skills.SetMember("alteration", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kAlteration)));
 		skills.SetMember("conjuration", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kConjuration)));
@@ -286,7 +262,6 @@ namespace Scaleform
 		skills.SetMember("mysticism", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kMysticism)));
 		skills.SetMember("restoration", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kRestoration)));
 		skills.SetMember("acrobatics", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kAcrobatics)));
-		skills.SetMember("hand_to_hand", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kHandToHand)));
 		skills.SetMember("light_armor", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kLightArmor)));
 		skills.SetMember("marksman", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kMarksman)));
 		skills.SetMember("mercantile", player->GetPermanentActorValue(static_cast<AV>(SkyAV::kMercantile)));

@@ -4,17 +4,12 @@ import skyui.util.Translator;
 
 class ClassCreationTextInput extends TextInput {
     private var _textFormat:TextFormat; // save original text format because scaleform shit in skyrim never work as expected so i have to restore the fucking original color and remove default text manually
-    private var bg:MovieClip;
 
     public function ClassCreationTextInput() {
         super();
         _textFormat = textField.getNewTextFormat();
         _textFormat.italic = false;
-        _textFormat.color = 0xe9c785;
-
-        if (bg != undefined) {
-            bg.onRollOver = handleBGRollOver;
-        }
+        _textFormat.color = 0xE2CEAA;
     }
 
     public function get textOrDefault() {
@@ -28,16 +23,9 @@ class ClassCreationTextInput extends TextInput {
         super.changeFocus();
         if (_focused) {
             if (textField.text == Translator.translate(defaultText)) {
-                textField.setTextFormat(_textFormat);
-                this.text = "";
+                text = "";
             }
         }
-    }
-
-    private function handleBGRollOver(controllerIdx:Number):Void {
-		// dispatching an event here doesnt seem to work... i hate flash
-		_parent._parent.skill_art.gotoAndStop("custom");
-        _parent._parent.skill_description.text = "$CUSTOM_DESC";
     }
 
     // override
@@ -50,13 +38,17 @@ class ClassCreationTextInput extends TextInput {
                 textField.html = false;
                 textField.text = _text;
             }
-            textField.setTextFormat(_textFormat);
         } else {
             textField.text = "";
             if (!_focused && defaultText != "") {
                 textField.text = defaultText;
-                textField.setTextFormat(defaultTextFormat);
             }
+        }
+
+        if (textField.text == Translator.translate(defaultText)) {
+            textField.setTextFormat(defaultTextFormat);
+        } else { // idk why this doesnt update until focus is lost... did i mention i hate flash?
+            textField.setTextFormat(_textFormat);
         }
     }
 }

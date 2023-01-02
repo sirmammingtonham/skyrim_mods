@@ -63,7 +63,7 @@ class ClassCreationMenu extends MovieClip {
     private var blunt:ClassCreationButton;
     private var hand_to_hand:ClassCreationButton;
     private var heavy_armor:ClassCreationButton;
-    private var smithing:ClassCreationButton;
+    private var armorer:ClassCreationButton;
     // mage skills
     private var alchemy:ClassCreationButton;
     private var alteration:ClassCreationButton;
@@ -91,8 +91,8 @@ class ClassCreationMenu extends MovieClip {
     private var carry_weight:MovieClip;
 
     // other stuff
-    private var select_class:ClassCreationButton;
-    private var create_class:ClassCreationButton;
+    // private var select_class:ClassCreationButton;
+    // private var create_class:ClassCreationButton;
 
     private var attribute_indicator:MovieClip;
     private var skill_indicator:MovieClip;
@@ -111,7 +111,7 @@ class ClassCreationMenu extends MovieClip {
     private var _state:Object = new Object();
 
     /////
-    private var _mode:Number = 0;
+    private var _mode:Number = -1;
     private var _numAttributes:Number = 0;
     private var _numSkills:Number = 0;
     private var _classButtons:Array;
@@ -119,6 +119,9 @@ class ClassCreationMenu extends MovieClip {
     private var _attrButtons:Array;
     private var _skillButtons:Array;
     private var _stats:Array;
+    private var _prevButtonHover:ClassCreationButton;
+    private var _customDescriptionStorage:String;
+    private var _customSelected:Array;
 
     /////
 
@@ -161,7 +164,7 @@ class ClassCreationMenu extends MovieClip {
             blunt,
             hand_to_hand,
             heavy_armor,
-            smithing,
+            armorer,
             alchemy,
             alteration,
             conjuration,
@@ -211,16 +214,16 @@ class ClassCreationMenu extends MovieClip {
         }
 
         ///
-        select_class.addEventListener(EventTypes.CLICK, this, "handleSelectClassPress");
-        create_class.addEventListener(EventTypes.CLICK, this, "handleCreateClassPress");
+
+        _root.select_class.addEventListener(EventTypes.SELECT, this, "handleSelectClassPress");
+        _root.create_class.addEventListener(EventTypes.SELECT, this, "handleCreateClassPress");
+
         confirm.addEventListener(EventTypes.CLICK, this, "handleConfirmPress");
-
-        select_class.texts.textField.text = "$Select Class";
-        create_class.texts.textField.text = "$Create Class";
-
-        handleSelectClassPress();
-
         confirm.disabled = true;
+
+        _root.select_class.selected = true;
+        _customDescriptionStorage = "";
+        _customSelected = [];
     }
 
     public function InitExtensions():Void {
@@ -231,8 +234,31 @@ class ClassCreationMenu extends MovieClip {
         return true;
     }
 
+    private function SetInfo(statsArg:Object, attrArg:Object, skillArg:Object) {
+        // sets the initial info
+        for (var i = 0; i < _stats.length; i++) {
+            _state[_stats[i]._name] = Math.round(statsArg[_stats[i]._name]);
+            if (i >= 3 && i <= 5) {
+                _state[_stats[i]._name] += "/s"
+            }
+        }
+        for (var i = 0; i < _attrButtons.length; i++) {
+            _state[_attrButtons[i]._name] = attrArg[_attrButtons[i]._name];
+        }
+        for (var i = 0; i < _skillButtons.length; i++) {
+            _state[_skillButtons[i]._name] = skillArg[_skillButtons[i]._name];
+        }
+
+        calculateBonuses();
+    }
+
     private function handleSelectClassPress(a_event:Object) {
+        if (_mode == SELECT) {
+            return;
+        }
         _mode = SELECT;
+        _customSelected = getSelected(true);
+        _customDescriptionStorage = class_description.text;
         monk.selected = true; // select random class so we can reset if after create class (hacky but fuck you)
         acrobat.selected = true; // default
 
@@ -260,10 +286,13 @@ class ClassCreationMenu extends MovieClip {
     }
 
     private function handleCreateClassPress(a_event:Object) {
+        if (_mode == CREATE) {
+            return;
+        }
         _mode = CREATE;
         unselectAll();
         combat.selected = true;
-        
+
         for (var i = 0; i < _classButtons.length; i++) {
             _classButtons[i].disabled = true;
             _classButtons[i]._alpha = 0.0;
@@ -278,6 +307,8 @@ class ClassCreationMenu extends MovieClip {
             _skillButtons[i].disabled = false;
         }
         class_art.gotoAndStop("custom");
+        class_description.text = _customDescriptionStorage;
+        selectAll(_customSelected);
 
         custom_class_name.swapDepths(mage);
         class_description.disabled = false;
@@ -286,59 +317,57 @@ class ClassCreationMenu extends MovieClip {
         custom_class_name._alpha = 100;
         attribute_indicator._alpha = 100;
         skill_indicator._alpha = 100;
+
     }
 
-    private function SetInfo(statsArg:Object, attrArg:Object, skillArg:Object) {
-        // sets the initial info
-        for (var i = 0; i < _stats.length; i++) {
-            _state[_stats[i]._name] = Math.round(statsArg[_stats[i]._name]);
-            if (i >= 3 && i <= 5) {
-                _state[_stats[i]._name] += "/s"
+    private function getSelected(return_names:Boolean):Array {
+        var args:Array = [];
+        for (var i = 0; i < _attrButtons.length; i++) {
+            if (_attrButtons[i].selected) {
+                if (return_names) {
+                    args.push(_attrButtons[i]._name);
+                } else {
+                    args.push(i);
+                }
             }
         }
-        for (var i = 0; i < _attrButtons.length; i++) {
-            _state[_attrButtons[i]._name] = attrArg[_attrButtons[i]._name];
+        for (var i = 0; i < _specButtons.length; i++) {
+            if (_specButtons[i].selected) {
+                if (return_names) {
+                    args.push(_specButtons[i]._name);
+                } else {
+                    args.push(i);
+                }
+            }
         }
         for (var i = 0; i < _skillButtons.length; i++) {
-            _state[_skillButtons[i]._name] = skillArg[_skillButtons[i]._name];
+            if (_skillButtons[i].selected) {
+                if (return_names) {
+                    args.push(_skillButtons[i]._name);
+                } else {
+                    args.push(i);
+                }
+            }
         }
-
-        calculateBonuses();
+        return args;
     }
 
     private function handleConfirmPress(a_event:Object) {
+        var args:Array = getSelected(false);
         if (_mode == SELECT) {
             for (var i = 0; i < _classButtons.length; i++) {
                 if (_classButtons[i].selected) {
-                    GameDelegate.call("OnConfirmList", [i]);
-                    return;
+                    args.push(_classButtons[i]._name);
+                    break;
                 }
             }
-        }
-
-        if (_mode == CREATE) {
-            var args:Array = [];
-            for (var i = 0; i < _attrButtons.length; i++) {
-                if (_attrButtons[i].selected) {
-                    args.push(i);
-                }
-            }
-            for (var i = 0; i < _specButtons.length; i++) {
-                if (_specButtons[i].selected) {
-                    args.push(i);
-                }
-            }
-            for (var i = 0; i < _skillButtons.length; i++) {
-                if (_skillButtons[i].selected) {
-                    args.push(i);
-                }
-            }
+            args.push(Translator.translate(class_description.textOrDefault));
+        } else if (_mode == CREATE) {
             args.push(custom_class_name.textOrDefault)
-            args.push(class_description.textOrDefault)
-
-            GameDelegate.call("OnConfirmCustom", args);
-            return;
+            args.push(class_description.textOrDefault);
         }
+
+        GameDelegate.call("OnConfirm", args);
     }
 
     private function handleClassPress(a_event:Object) {
@@ -404,10 +433,18 @@ class ClassCreationMenu extends MovieClip {
     private function handleButtonHover(a_event:Object) {
         skill_art.gotoAndStop(a_event.target._name);
         skill_description.text = "$" + a_event.target._name.toUpperCase() + "_DESC";
+
+        a_event.target.showFrame = true;
+        if (_prevButtonHover != undefined && _prevButtonHover != a_event.target) {
+            _prevButtonHover.showFrame = false;
+        }
+        _prevButtonHover = a_event.target;
     }
 
     private function setButtonText() {
-        skill_description.text = ""; // todo: change to default
+        _root.select_class.texts.textField.text = "$SELECT_CLASS";
+        _root.create_class.texts.textField.text = "$CREATE_CLASS";
+        skill_description.text = "$SKILL_DEFAULT_DESC";
 
         for (var i = 0; i < _classButtons.length; i++) {
             _classButtons[i].texts.textField.text = "$" + _classButtons[i]._name.toUpperCase();
@@ -452,24 +489,24 @@ class ClassCreationMenu extends MovieClip {
 
         // add bonus from specialization
         if (combat.selected) {
-            for (var i = 0; i < 9; i++) {
+            for (var i = 0; i < 7; i++) {
                 state_copy[_skillButtons[i]._name] += 5;
             }
             confirm_counter++;
         } else if (magic.selected) {
-            for (var i = 9; i < 18; i++) {
+            for (var i = 7; i < 14; i++) {
                 state_copy[_skillButtons[i]._name] += 5;
             }
             confirm_counter++;
         } else if (stealth.selected) {
-            for (var i = 18; i < 27; i++) {
+            for (var i = 14; i < 21; i++) {
                 state_copy[_skillButtons[i]._name] += 5;
             }
             confirm_counter++;
         }
 
         // update values on menu
-        confirm.disabled = (confirm_counter != 9);
+        confirm.disabled = (confirm_counter != 10);
         for (var name in state_copy) {
             this[name].value = state_copy[name];
         }

@@ -67,31 +67,25 @@ namespace Scaleform
 
 		enum class Skill
 		{
-			kAthletics = 0,
-			kAxe,
+			kArmorer = 0,
+			kAthletics,
+			kBlade,
 			kBlock,
 			kBlunt,
+			kHandToHand,
 			kHeavyArmor,
-			kLongBlade,
-			kMediumArmor,
-			kPolearm,
-			kSmithing,
 			kAlchemy,
 			kAlteration,
 			kConjuration,
 			kDestruction,
-			kEnchanting,
 			kIllusion,
 			kMysticism,
 			kRestoration,
-			kUnarmorerd,
 			kAcrobatics,
-			kHandToHand,
 			kLightArmor,
 			kMarksman,
 			kMercantile,
 			kSecurity,
-			kShortBlade,
 			kSneak,
 			kSpeechcraft,
 		};
@@ -100,7 +94,7 @@ namespace Scaleform
 		{
 			std::pair<Attribute, Attribute> attributes;
 			Specialization specialization;
-			std::array<Skill, 9> skills;
+			std::array<Skill, 7> skills;
 
 			std::string_view name;
 			std::string_view description;
@@ -108,32 +102,26 @@ namespace Scaleform
 
 		enum ActorValue
 		{
-			kAxe = RE::ActorValue::kEnchanting,
+			kBlade = RE::ActorValue::kOneHanded,
 			kBlock = RE::ActorValue::kBlock,
 			kBlunt = RE::ActorValue::kTwoHanded,
-			kHeavyArmor = RE::ActorValue::kHeavyArmor,
-			kLongBlade = RE::ActorValue::kOneHanded,
-			kMediumArmor = RE::ActorValue::kHeavyArmorModifier,
-			kPolearm = RE::ActorValue::kSmithing,
-			kSmithing = RE::ActorValue::kSmithingModifier,
+			kArmorer = RE::ActorValue::kSmithing,
 			kAthletics = RE::ActorValue::kTwoHandedModifier,
-			kAlchemy = RE::ActorValue::kAlchemyModifier,
+			kAlchemy = RE::ActorValue::kAlchemy,
 			kAlteration = RE::ActorValue::kAlteration,
 			kConjuration = RE::ActorValue::kConjuration,
 			kDestruction = RE::ActorValue::kDestruction,
-			kEnchanting = RE::ActorValue::kEnchantingModifier,
 			kIllusion = RE::ActorValue::kIllusion,
-			kMysticism = RE::ActorValue::kAlchemy,
+			kMysticism = RE::ActorValue::kEnchanting,
 			kRestoration = RE::ActorValue::kRestoration,
-			kUnarmorerd = RE::ActorValue::kSneakingModifier,
+			kHeavyArmor = RE::ActorValue::kHeavyArmor,
 			kHandToHand = RE::ActorValue::kLightArmorModifier,
 			kLightArmor = RE::ActorValue::kLightArmor,
 			kMarksman = RE::ActorValue::kArchery,
 			kSecurity = RE::ActorValue::kLockpicking,
-			kShortBlade = RE::ActorValue::kPickpocket,
 			kSneak = RE::ActorValue::kSneak,
 			kMercantile = RE::ActorValue::kSpeech,
-			kAcrobatics = RE::ActorValue::kOneHandedModifier,
+			kAcrobatics = RE::ActorValue::kPickpocket,
 			kSpeechcraft = RE::ActorValue::kIllusionModifier,
 			kStrength = RE::ActorValue::kFavorActive,
 			kIntelligence = RE::ActorValue::kFavorsPerDayTimer,
@@ -211,13 +199,11 @@ namespace Scaleform
 		static void Log(const RE::FxDelegateArgs& a_params);
 		static void OnTextFocus(const RE::FxDelegateArgs& a_params);
 		static void OnTextUnfocus(const RE::FxDelegateArgs& a_params);
-		static void OnProceedList(const RE::FxDelegateArgs& a_params);
-		static void OnProceedCustom(const RE::FxDelegateArgs& a_params);
+		static void OnConfirm(const RE::FxDelegateArgs& a_params);
 		static void CloseMenu(const RE::FxDelegateArgs& a_params);
 
 		void InitExtensions();
-		void OnProceedList(Skyblivion::Class a_class);
-		void OnProceedCustom(Skyblivion::CustomClassData a_data);
+		void OnConfirm(Skyblivion::CustomClassData a_data);
 		void SetInfo();
 
 		// papyrus register helpers
